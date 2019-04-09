@@ -1,0 +1,21 @@
+﻿  stdafx.cpp
+  ControlDlg.cpp
+  ControlView.cpp
+  DisplayView.cpp
+  FileDlg.cpp
+  MachineDlg.cpp
+  MySocket.cpp
+  RecoveryFileView.cpp
+  MainFrm.cpp
+  SampleFileView.cpp
+  utility.cpp
+  ValidateUI.cpp
+  ValidateUIDoc.cpp
+  ValidateUIView.cpp
+  VBox.cpp
+  VBoxController.cpp
+  Generating code
+  All 1578 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  ValidateUI.vcxproj -> C:\Users\20082\Source\Repos\naelonambul\InCompleteProject\ValidateUI\Release\ValidateUI.exe
+  ValidateUI.vcxproj -> C:\Users\20082\Source\Repos\naelonambul\InCompleteProject\ValidateUI\Release\ValidateUI.pdb (Full PDB)
