@@ -62,8 +62,7 @@ BOOL CControlDlg::OnInitDialog()
 
 	// TODO:  Add extra initialization here
 	Win.GetProgramFilesPath();
-	Win.makeTailCommand(VMLIST);
-	Win.Run();
+	Win.Run(VMLIST);
 	ResetOSList();
 	m_comboOSList.SetCurSel(0);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -89,12 +88,10 @@ void CControlDlg::OnBnClickedButtonVmRun()
 	//GetDlgItem(IDC_BUTTON_VMRESET)->EnableWindow(TRUE);
 	//GetDlgItem(IDC_BUTTON_EXPORT)->EnableWindow(FALSE);
 	Win.SetCurrentOS(myCurSel);
-	Win.makeTailCommand(VMSTOP);
-	Win.Run();
+	Win.Run(VMSTOP);
 	Sleep(100);
 
-	Win.makeTailCommand(VMSTART);
-	Win.Run();
+	Win.Run(VMSTART);
 	Sleep(100);
 }
 
@@ -115,13 +112,13 @@ void CControlDlg::OnBnClickedButtonSendfile()
 		theApp.m_pDoc->GetToolPath() != "") {
 		theApp.m_sCommand.SendCommand(COMMAND_SND_SAMPLE, 0);
 		theApp.m_sCommand.SendFile(theApp.m_pDoc->GetSamplePath());
-		Sleep(100);
+		Sleep(1000);
 		theApp.m_sCommand.SendCommand(COMMAND_SND_TOOL, 0);
 		theApp.m_sCommand.SendFile(theApp.m_pDoc->GetToolPath());
-		Sleep(100);
-		//theApp.m_sCommand.SendCommand(COMMAND_RUN_SAMPLE, 0);
-		//Sleep(100);
-		//theApp.m_sCommand.SendCommand(COMMAND_RUN_TOOL, 0);
+		Sleep(1000);
+		theApp.m_sCommand.SendCommand(COMMAND_RUN_SAMPLE, 0);
+		Sleep(1000);
+		theApp.m_sCommand.SendCommand(COMMAND_RUN_TOOL, 0);
 	}
 	else
 		AfxMessageBox(_T("파일 경로를 확인해 주세요."));
@@ -212,16 +209,11 @@ void CControlDlg::ResetOSList()
 	}
 }
 
-
-
-
 void CControlDlg::AddReady()
 {
 	if( nReady < 3 && nReady >= 0)
 	++nReady;
 }
-
-
 
 BOOL CControlDlg::IsReady()
 {

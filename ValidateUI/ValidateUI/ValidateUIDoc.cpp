@@ -3,6 +3,7 @@
 //
 
 #include "stdafx.h"
+#include <locale.h>
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
 // and search filter handlers and allows sharing of document code with that project.
 #ifndef SHARED_HANDLERS
@@ -36,6 +37,7 @@ CValidateUIDoc::CValidateUIDoc()
 
 CValidateUIDoc::~CValidateUIDoc()
 {
+	clearPtrList();
 }
 
 BOOL CValidateUIDoc::OnNewDocument()
@@ -165,12 +167,31 @@ CString& CValidateUIDoc::GetToolPath()
 }
 
 
+
+void CValidateUIDoc::clearPtrList()
+{
+	releasePtrList(Version07);
+	releasePtrList(Version08);
+	releasePtrList(Version10);
+}
+
+void CValidateUIDoc::releasePtrList(CPtrList &nParam)
+{
+	while (!nParam.IsEmpty())
+	{
+		MYLOG* pData = (MYLOG*)nParam.RemoveHead();
+		delete pData;
+		pData = nullptr;
+	}
+}
+
 BOOL CValidateUIDoc::exportCSV()
 {
+	_wsetlocale(LC_ALL, L"kor");
 	FILE* fp = nullptr;
 		fopen_s(&fp, "Report.csv", "w+");
 
-		_ftprintf(fp, _T("Time, OsVersion, Command, Count of same hash file\n"));
+		_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
 	POSITION pos = Version07.GetHeadPosition();
 	MYLOG* csvBuffer;
 
@@ -264,5 +285,7 @@ void CValidateUIDoc::CmdToCString(const int nCmd)
 	case COMMAND_END_TOOL:		transBuffer.LoadString(IDS_STRING_END_TOOL); break;
 	case COMMAND_LOG_TOOL:		transBuffer.LoadString(IDS_STRING_LOG_TOOL); break;
 	case COMMAND_STOP:			transBuffer.LoadString(IDS_STRING_STOP); break;
+	case COMMAND_READY:			transBuffer.LoadString(IDS_STRING_AGENTREADY); break;
 	}
 }
+

@@ -26,6 +26,7 @@ typedef enum COMMAND
 	COMMAND_LOG_TOOL = 420,
 
 	COMMAND_STOP = 500,
+	COMMAND_READY = 600,
 	COMMAND_HEALTH = 0
 } COMMAND;
 
@@ -43,7 +44,7 @@ typedef struct MYCOMMAND
 typedef struct RETURNMESSAGE
 {
 	int nCode;					
-	char szDesc[256];
+	TCHAR szDesc[256];
 } RETURNMESSAGE;
 
 ///

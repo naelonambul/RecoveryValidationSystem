@@ -213,24 +213,24 @@ void CValidateUIApp::SetValidateDoc(CValidateUIDoc* pDoc)
 
 UINT CValidateUIApp::ThreadAccept(LPVOID pParam)
 {
-	//AfxMessageBox(_T("ThreadAccept Start\n"));
-
+	//create thread for each agent
 	((CValidateUIApp*)pParam)->m_sCommand.InitCS();
 	if (((CValidateUIApp*)pParam)->m_sCommand.mySocket())
 		return 1;
-
+	 
 	return 0;
 }
 
 UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 {
-	//AfxMessageBox(_T("ThreadCommand Start\n"));
 	int nReceive = 0;
 	CMySocket* mySocket = (CMySocket*)pParam;
 	SOCKET hClient = mySocket->Get_cSocket();
 
 	MYCOMMAND sBuffer = { 0 };
 	int nVersion = 0;
+
+	//for connection check
 	struct timeval tv = { 0 };
 	tv.tv_sec = 12000;
 
@@ -239,6 +239,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 	while ((nReceive = ::recv(hClient,
 		(char*)&sBuffer, sizeof(sBuffer), 0)) > 0)
 	{
+		nVersion = sBuffer.nVersion;
 
 		CString CommandString;
 
@@ -256,24 +257,32 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 		case COMMAND_END_TOOL:		CommandString.LoadString(IDS_STRING_END_TOOL); break;
 		case COMMAND_LOG_TOOL:		CommandString.LoadString(IDS_STRING_LOG_TOOL); break;
 		case COMMAND_STOP:			CommandString.LoadString(IDS_STRING_STOP); break;
+		case COMMAND_READY:			CommandString.LoadString(IDS_STRING_AGENTREADY); break;
 		}
 
-
-		switch (sBuffer.nVersion)
+		if (sBuffer.nCode != COMMAND_HEALTH)
 		{
-		case 7:
-			nVersion = sBuffer.nVersion;
+			//create log
+			MYLOG* tmpLog = new MYLOG;
+			tmpLog->cNow = CTime::GetCurrentTime();
+			tmpLog->nCode = sBuffer.nCode;
+			tmpLog->nSize = sBuffer.nSize;
+			tmpLog->nVersion = sBuffer.nVersion;
 
-			if (sBuffer.nCode != 0) {
-				MYLOG* tmpLog = new MYLOG;
-				tmpLog->cNow = CTime::GetCurrentTime();
-				tmpLog->nCode = sBuffer.nCode;
-				tmpLog->nSize = sBuffer.nSize;
-				tmpLog->nVersion = sBuffer.nVersion;
+			//push data doc,ui
+			CTime timeBuffer = tmpLog->cNow;
+			CString strDataTime;
+			strDataTime = timeBuffer.Format(_T("%Y년%m월%d일 - %I:%M:%S "));
+			CommandString.Insert(0, strDataTime);
 
+			switch (sBuffer.nVersion)
+			{
+			case 7:
 				theApp.m_pDoc->Version07.AddTail(tmpLog);
+				theApp.m_pDisplayView->m_wndMachine07.ListInsertString(CommandString);
+
 				switch (sBuffer.nCode) {
-				case COMMAND_RUN_SAMPLE:
+				case COMMAND_READY:
 					theApp.m_pDisplayView->m_wndMachine07.m_nFile = sBuffer.nSize;
 					break;
 				case COMMAND_LOG_SAMPLE:
@@ -283,23 +292,15 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 					theApp.m_pDisplayView->m_wndMachine07.m_nRecovery = sBuffer.nSize;
 					break;
 				}
-			}
-			theApp.m_pDisplayView->InvalidateRect(NULL, 0);
-			break;
+				theApp.m_pDisplayView->m_wndMachine07.InvalidateRect(NULL, 0);
+				break;
 
-		case 8:
-			nVersion = sBuffer.nVersion;
-
-			if (sBuffer.nCode != 0) {
-				MYLOG* tmpLog = new MYLOG;
-				tmpLog->cNow = CTime::GetCurrentTime();
-				tmpLog->nCode = sBuffer.nCode;
-				tmpLog->nSize = sBuffer.nSize;
-				tmpLog->nVersion = sBuffer.nVersion;
-
+			case 8:
 				theApp.m_pDoc->Version08.AddTail(tmpLog);
+				theApp.m_pDisplayView->m_wndMachine08.ListInsertString(CommandString);
+
 				switch (sBuffer.nCode) {
-				case COMMAND_RUN_SAMPLE:
+				case COMMAND_READY:
 					theApp.m_pDisplayView->m_wndMachine08.m_nFile = sBuffer.nSize;
 					break;
 				case COMMAND_LOG_SAMPLE:
@@ -309,23 +310,15 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 					theApp.m_pDisplayView->m_wndMachine08.m_nRecovery = sBuffer.nSize;
 					break;
 				}
-			}
-			theApp.m_pDisplayView->InvalidateRect(NULL, 0);
-			break;
+				theApp.m_pDisplayView->m_wndMachine08.InvalidateRect(NULL, 0);
+				break;
 
-		case 10:
-			nVersion = sBuffer.nVersion;
-
-			if (sBuffer.nCode != 0) {
-				MYLOG* tmpLog = new MYLOG;
-				tmpLog->cNow = CTime::GetCurrentTime();
-				tmpLog->nCode = sBuffer.nCode;
-				tmpLog->nSize = sBuffer.nSize;
-				tmpLog->nVersion = sBuffer.nVersion;
-
+			case 10:
 				theApp.m_pDoc->Version10.AddTail(tmpLog);
+				theApp.m_pDisplayView->m_wndMachine10.ListInsertString(CommandString);
+
 				switch (sBuffer.nCode) {
-				case COMMAND_RUN_SAMPLE:
+				case COMMAND_READY:
 					theApp.m_pDisplayView->m_wndMachine10.m_nFile = sBuffer.nSize;
 					break;
 				case COMMAND_LOG_SAMPLE:
@@ -335,20 +328,22 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 					theApp.m_pDisplayView->m_wndMachine10.m_nRecovery = sBuffer.nSize;
 					break;
 				}
-			}
-			theApp.m_pDisplayView->InvalidateRect(NULL, 0);
-			break;
+				theApp.m_pDisplayView->m_wndMachine10.InvalidateRect(NULL, 0);
 
-		default: 
-			break;
+				break;
 
+			default:
+				break;
 			}
-			memset((void*)&sBuffer, 0, sizeof(sBuffer));
+		}
+
+		if(sBuffer.nCode == COMMAND_ERROR)
+			//에러 코드 관리.
+
+		//theApp.m_pDisplayView->InvalidateRect(NULL, 0); //대화상자에 해주면?
+		memset((void*)&sBuffer, 0, sizeof(sBuffer));
 	}
 
-	CString myError;
-	myError.Format(_T("Disconnected : WIN %d"), nVersion);
-	AfxMessageBox(myError);
 
 	::EnterCriticalSection(&mySocket->m_cs);		
 
@@ -359,6 +354,9 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 	::LeaveCriticalSection(&mySocket->m_cs);		
 	::closesocket(hClient);
 
-	OutputDebugString(_T("ThreadCommand End\n"));
+	CString myError;
+	myError.Format(_T("Disconnected : WIN %d"), nVersion);
+	AfxMessageBox(myError);
+
 	return 2;
 }

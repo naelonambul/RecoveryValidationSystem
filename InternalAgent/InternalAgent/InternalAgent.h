@@ -185,8 +185,12 @@ BOOL SendCommand(int nCommandCode, cDataStruct* agentData, SOCKET hSocket){
 	memset(&Cmd, 0, sizeof(Cmd));
 	return 0;
 }
+//BOOL SendError(const char* message) {
+//	RETURNMESSAGE error;
+//	error.szDesc
+//}
 
-	/////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////
 	string makehash(const char* filepath)	{
 		DWORD dwStatus = 0;
 		BOOL bResult = FALSE;

@@ -94,7 +94,7 @@ void CMachineDlg::OnPaint()
 
 	CString strInfect;
 	strInfect.LoadStringW(IDS_STRING_INFECTFILE);
-	strInfect.AppendFormat(_T("%d"), m_nFile - m_nInfect);
+	strInfect.AppendFormat(_T("%d"),m_nInfect);
 	memdc.TextOut(50, 200, strInfect);
 
 	CString strRecovery;

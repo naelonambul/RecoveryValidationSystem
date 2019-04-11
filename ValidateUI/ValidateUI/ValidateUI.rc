@@ -126,7 +126,6 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_CONTROLDLG, DIALOG
     BEGIN
-        MOCKUP, 0, 50, 0, 0, "..\..\..\..\CONTROL_DLG.jpg"
         LEFTMARGIN, 7
         RIGHTMARGIN, 89
         TOPMARGIN, 7
@@ -135,7 +134,6 @@ BEGIN
 
     IDD_FILE_FORM, DIALOG
     BEGIN
-        MOCKUP, 1, 50, 0, 0, "..\..\..\..\FILE_DLG.jpg"
         LEFTMARGIN, 4
         RIGHTMARGIN, 116
         TOPMARGIN, 7
@@ -144,7 +142,6 @@ BEGIN
 
     IDD_MACDIS_FORM, DIALOG
     BEGIN
-        MOCKUP, 0, 50, 0, 0, "..\..\..\..\주석 2019-03-19 123010.jpg"
         LEFTMARGIN, 7
         RIGHTMARGIN, 209
         TOPMARGIN, 7
@@ -323,9 +320,10 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_STRING_NUMFILE      "샘플 총 파일의 개수 :"
-    IDS_STRING_INFECTFILE   "감염된 파일의 개수 :"
+    IDS_STRING_NUMFILE      "샘플  파일의 개수 :"
+    IDS_STRING_INFECTFILE   "감염되지 않은 파일의 개수 :"
     IDS_STRING_RECOVEFILE   "복구된 파일의 개수 :"
+    IDS_STRING_AGENTREADY   "에이전트가 준비 되었습니다."
 END
 
 #endif    // Korean (Korea) resources

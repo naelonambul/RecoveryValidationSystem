@@ -58,6 +58,9 @@ protected:
 #endif // SHARED_HANDLERS
 	
 public:
+	void releasePtrList(CPtrList &nParam);
+	void clearPtrList();
+
 	void SetSamplePath(CString cPath);
 	void SetToolPath(CString  cPath);
 
@@ -66,4 +69,5 @@ public:
 	void CmdToCString(const int nCmd);
 
 	BOOL exportCSV();
+
 };

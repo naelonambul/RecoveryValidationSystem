@@ -5,7 +5,7 @@
 #include "stdafx.h"
 
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
-#define SERVERIP "192.168.149.1"
+#define SERVERIP "192.168.56.1"
 
 #include "InternalAgent.h"
 
@@ -99,6 +99,8 @@ int main()
 	pAgentFuc[COMMAND_RUN_TOOL]		= p_RUN_TOOLfuc;
 	pAgentFuc[COMMAND_HEALTH]		= p_HEALTHfuc;
 
+	//Ready
+	SendCommand(COMMAND_READY, &myData, hSocket);
 
 	while (1) {
 		cBuffer = { 0 };

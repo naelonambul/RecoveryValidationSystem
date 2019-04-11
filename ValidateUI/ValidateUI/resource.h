@@ -49,6 +49,7 @@
 #define IDS_STRING_INFECTFILE           50017
 #define IDS_STRING_RCVOFILE             50018
 #define IDS_STRING_RECOVEFILE           50018
+#define IDS_STRING_AGENTREADY           50019
 
 // Next default values for new objects
 // 

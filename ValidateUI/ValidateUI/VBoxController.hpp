@@ -87,31 +87,51 @@ namespace VBox
 		}
 
 
-		void Run()
+		void Run(int nOrder)
 		{
+			makeTailCommand(nOrder);
 			FILE* fp = RunShellCommand(MyCommand, READ_MODE);
 
 			unsigned char buffer[1024 + 1] = { 0 };
 			size_t count = 0;
 
 			while (!feof(fp)) {
-				count = fread(&buffer, 1, sizeof(buffer) - 1, fp);	
+				count = fread(&buffer, 1, sizeof(buffer) - 1, fp);
 				buffer[count] = '\0';
-				
-				string str((char*)buffer);
-				 
-				string FoundName;
-				string FoundOS;
-				string FoundError;
-				regexPipe(str, "^Name:\\s+(.*)\r\n", FoundName);
-				regexPipe(str, "^Guest OS:\\s+(.*)\r\n", FoundOS);
-				if(regexPipe(str, "error:(.*)\r\n", FoundError))				
-				AfxMessageBox(CString(FoundError.c_str()));
 
-				if(FoundName != "" && FoundOS != "")
-					mapOS.insert(pair<string, string>(FoundName, FoundOS));
+				string str((char*)buffer);
+
+				if (nOrder == VMLIST) //parsing vm list
+				{
+					string FoundName;
+					string FoundOS;
+					regexPipe(str, "^Name:\\s+(.*)\r\n", FoundName);
+					regexPipe(str, "^Guest OS:\\s+(.*)\r\n", FoundOS);
+					if (FoundName != "" && FoundOS != "")
+						mapOS.insert(pair<string, string>(FoundName, FoundOS));
+				}
+				//parsing error
+				string ReturnPipe;
+				if (nOrder != VMSTOP)
+				{
+					regexPipe(str, "error:(.*)\r\n", ReturnPipe);
+					//AfxMessageBox(CString(ReturnPipe.c_str()));
+				}
 			}
 			Sleep(1);
+		}
+
+		bool regexPipe(string& sTarget, const char* sentence, string& sFound)
+		{
+			regex regName(sentence);
+			smatch m;
+			if (regex_search(sTarget, m, regName)) {
+				for (auto& buffer : m)
+					sFound = buffer;
+			}
+
+			if (sFound == "")	return false;
+			else				return true;
 		}
 
 		void SetCurrentOS(CString &nOSVersion)
@@ -131,30 +151,17 @@ namespace VBox
 						PrintIter->first.begin(), PrintIter->first.end());	{
 						CString transbuffer(PrintIter->first.c_str());
 						SetCurrentOS(transbuffer);
-						makeTailCommand(VMSTOP);
-						Run(); 
+						Run(VMSTOP);
 						Sleep(500);
 
-						makeTailCommand(VMRECOVERYSNAP);
-						Run();
+						Run(VMRECOVERYSNAP);
 						Sleep(500);
 					}
 				}
 			}
 		}
 		 
-		bool regexPipe(string& sTarget,const char* sentence, string& sFound)
-		{
-			regex regName(sentence);
-			smatch m;
-			if (regex_search(sTarget, m, regName)) {
-				for (auto& buffer : m)
-					sFound = buffer;
-			}
 
-			if (sFound == "")	return false;
-			else				return true;
-		}
 };
 }
   
