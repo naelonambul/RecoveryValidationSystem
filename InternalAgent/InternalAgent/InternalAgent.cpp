@@ -20,6 +20,7 @@ using ::MyData::WatchDirectory;
 using ::MyData::CompareMap;
 using ::MyData::SendCommand;
 using ::MyData::Version_OS;
+using ::MyData::SendError;
 
 typedef int(*COMD_FUNC)(cDataStruct*, SOCKET);
 
@@ -110,7 +111,7 @@ int main()
 			cBuffer.nCode - myData.previousCommand == 100)
 			pAgentFuc[cBuffer.nCode]((cDataStruct*)&myData, hSocket);
 		else {
-			SendCommand(COMMAND_ERROR, &myData, hSocket);
+			SendError(_T("명령 순서가 맞지 않습니다."), &myData, hSocket);
 			break;
 		}
 
@@ -142,7 +143,7 @@ int p_SND_SAMPLEfuc(cDataStruct *agentData, SOCKET hSocket)
 	//Receive File info
 	FILEINFO sampleData = { 0 };
 	if (::recv(hSocket, (char*)&sampleData, sizeof(sampleData), 0) < sizeof(sampleData))
-		puts("Didn't receive File Info.");
+		SendError(_T("샘플 정보를 받지 못했습니다."), agentData, hSocket);
 
 	FILEINFO* pData = new FILEINFO(sampleData);
 	FILEINFO* pDataCopy = new FILEINFO(sampleData);
@@ -163,7 +164,7 @@ int p_SND_TOOLfuc(cDataStruct *agentData, SOCKET hSocket)
 	//Receive File info
 	FILEINFO toolData = { 0 };
 	if (::recv(hSocket, (char*)&toolData, sizeof(toolData), 0) <sizeof(toolData))
-		puts("Didn't receive File Info");
+		SendError(_T("복구 도구 정보를 받지 못했습니다."), agentData, hSocket);
 
 	FILEINFO* pData = new FILEINFO(toolData);
 	FILEINFO* pDataCopy = new FILEINFO(toolData);
@@ -191,7 +192,7 @@ int p_BEGIN_FILEfuc(cDataStruct *agentData, SOCKET hSocket)
 		0,
 		NULL);
 	if (hFile == INVALID_HANDLE_VALUE)
-		puts("Unable to Open.");
+		SendError(_T("전송된 파일을 열지 못했습니다."), agentData, hSocket);
 
 	//Receive
 	char byBuffer[65535] = {0};
@@ -208,7 +209,7 @@ int p_BEGIN_FILEfuc(cDataStruct *agentData, SOCKET hSocket)
 		}
 		else
 		{
-			puts("ERROR: When receive file");
+			SendError(_T("전송이 중단됬습니다."), agentData, hSocket);
 			break;
 		}
 	}
@@ -242,7 +243,7 @@ int p_RUN_SAMPLEfuc(cDataStruct *agentData, SOCKET hSocket)
 		NULL);	
 
 	if(hSamplethread == NULL)			
-		printf("Failed to run Sample");
+		SendError(_T("샘플을 실행하지 못했습니다."), agentData, hSocket);
 	else {
 		::SetEvent(agentData->SampleEvent);
 		printf("Detect File Change: %d\n",WatchDirectory());
@@ -290,7 +291,7 @@ int p_RUN_TOOLfuc(cDataStruct *agentData, SOCKET hSocket)
 		NULL);
 
 	if (hToolthread == NULL) 
-		printf("Failed to run Tool");
+		SendError(_T("복구도구를 실행하지 못했습니다."), agentData, hSocket);
 	else {
 		::SetEvent(agentData->ToolEvent);
 		printf("Detect File Change: %d\n", WatchDirectory()); 

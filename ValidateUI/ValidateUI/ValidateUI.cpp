@@ -340,7 +340,6 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 		if(sBuffer.nCode == COMMAND_ERROR)
 			//에러 코드 관리.
 
-		//theApp.m_pDisplayView->InvalidateRect(NULL, 0); //대화상자에 해주면?
 		memset((void*)&sBuffer, 0, sizeof(sBuffer));
 	}
 

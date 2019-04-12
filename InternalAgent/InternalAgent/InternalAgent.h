@@ -9,6 +9,7 @@
 
 // Testheader
 // C System
+#include <cstring>
 // C++ System
 #include <iostream>
 #include <winsock2.h>
@@ -181,15 +182,30 @@ BOOL SendCommand(int nCommandCode, cDataStruct* agentData, SOCKET hSocket){
 
 	if (hSocket != NULL)
 		::send(hSocket, reinterpret_cast<char*>(&Cmd), sizeof(Cmd), 0);
-	
+
 	memset(&Cmd, 0, sizeof(Cmd));
 	return 0;
 }
-//BOOL SendError(const char* message) {
-//	RETURNMESSAGE error;
-//	error.szDesc
-//}
+///////////////////////////////////////////////////////////////////////
+BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
+	MYCOMMAND Cmd;
+	Cmd.nCode = COMMAND_ERROR;
+	Cmd.nSize = 0;
+	Cmd.m_nVersion = agentData->m_nVersion;
 
+	RETURNMESSAGE Error;
+	Error.nCode = agentData->previousCommand;
+	 _tcscpy(Error.szDesc,  str);
+
+	if (hSocket != NULL)
+	{
+		::send(hSocket, reinterpret_cast<char*>(&Cmd), sizeof(Cmd), 0);
+		::send(hSocket, reinterpret_cast<char*>(&Error), sizeof(Error), 0);
+	}
+
+	memset(&Cmd, 0, sizeof(Cmd));
+	return 0;
+}
 /////////////////////////////////////////////////////////////////////
 	string makehash(const char* filepath)	{
 		DWORD dwStatus = 0;
