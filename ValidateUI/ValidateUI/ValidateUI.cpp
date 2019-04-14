@@ -12,6 +12,8 @@
 #include "ValidateUIView.h"
 #include "MyAppProtocol.h"
 #include "DisplayView.h"
+#include "ControlView.h"
+#include "ControlDlg.h"
 #include "MachineDlg.h"
 #include "resource.h"
 
@@ -151,7 +153,6 @@ int CValidateUIApp::ExitInstance()
 
 	m_evtExit.SetEvent();
 	Sleep(300);
-
 	return CWinApp::ExitInstance();
 }
 
@@ -165,7 +166,7 @@ class CAboutDlg : public CDialogEx
 public:
 	CAboutDlg();
 
-// Dialog Data
+// Dialog Data   
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ABOUTBOX };
 #endif
@@ -234,33 +235,14 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 	struct timeval tv = { 0 };
 	tv.tv_sec = 12000;
 
-	//setsockopt(hClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(struct timeval));
+	setsockopt(hClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(struct timeval));
 
 	while ((nReceive = ::recv(hClient,
 		(char*)&sBuffer, sizeof(sBuffer), 0)) > 0)
 	{
 		nVersion = sBuffer.nVersion;
 
-		CString CommandString;
-
-		switch (sBuffer.nCode) {
-		case COMMAND_HEALTH:		CommandString.LoadString(IDS_STRING_HEALTH); break;
-		case COMMAND_ERROR: 		CommandString.LoadString(IDS_STRING_ERROR); break;
-		case COMMAND_SND_SAMPLE:	CommandString.LoadString(IDS_STRING_SND_SAMPLE); break;
-		case COMMAND_SND_TOOL:		CommandString.LoadString(IDS_STRING_SND_TOOL); break;
-		case COMMAND_BEGIN_FILE:	CommandString.LoadString(IDS_STRING_BEGIN_FILE); break;
-		case COMMAND_END_FILE:		CommandString.LoadString(IDS_STRING_END_FILE); break;
-		case COMMAND_RUN_SAMPLE:	CommandString.LoadString(IDS_STRING_RUN_SAMPLE); break;
-		case COMMAND_END_SAMPLE:	CommandString.LoadString(IDS_STRING_END_SAMPLE); break;
-		case COMMAND_LOG_SAMPLE:	CommandString.LoadString(IDS_STRING_LOG_SAMPLE); break;
-		case COMMAND_RUN_TOOL:		CommandString.LoadString(IDS_STRING_RUN_TOOL); break;
-		case COMMAND_END_TOOL:		CommandString.LoadString(IDS_STRING_END_TOOL); break;
-		case COMMAND_LOG_TOOL:		CommandString.LoadString(IDS_STRING_LOG_TOOL); break;
-		case COMMAND_STOP:			CommandString.LoadString(IDS_STRING_STOP); break;
-		case COMMAND_READY:			CommandString.LoadString(IDS_STRING_AGENTREADY); break;
-		}
-
-		if (sBuffer.nCode != COMMAND_HEALTH)
+		if (sBuffer.nCode != COMMAND_HEALTH && sBuffer.nCode != COMMAND_ERROR)
 		{
 			//create log
 			MYLOG* tmpLog = new MYLOG;
@@ -269,24 +251,20 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 			tmpLog->nSize = sBuffer.nSize;
 			tmpLog->nVersion = sBuffer.nVersion;
 
-			//push data doc,ui
-			CTime timeBuffer = tmpLog->cNow;
-			CString strDataTime;
-			strDataTime = timeBuffer.Format(_T("%Y³â%m¿ù%dÀÏ - %I:%M:%S "));
-			CommandString.Insert(0, strDataTime);
-
 			switch (sBuffer.nVersion)
 			{
 			case 7:
-				theApp.m_pDoc->Version07.AddTail(tmpLog);
-				theApp.m_pDisplayView->m_wndMachine07.ListInsertString(CommandString);
+				theApp.m_pDoc->Version07.AddTail(tmpLog);   
+				theApp.m_pDisplayView->m_wndMachine07.ListInsertString(tmpLog);
 
 				switch (sBuffer.nCode) {
 				case COMMAND_READY:
+					//UI Begin 
 					theApp.m_pDisplayView->m_wndMachine07.m_nFile = sBuffer.nSize;
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine07.m_nInfect = sBuffer.nSize;
+					theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0, hClient);
 					break;
 				case COMMAND_LOG_TOOL:
 					theApp.m_pDisplayView->m_wndMachine07.m_nRecovery = sBuffer.nSize;
@@ -297,7 +275,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 
 			case 8:
 				theApp.m_pDoc->Version08.AddTail(tmpLog);
-				theApp.m_pDisplayView->m_wndMachine08.ListInsertString(CommandString);
+				theApp.m_pDisplayView->m_wndMachine08.ListInsertString(tmpLog);
 
 				switch (sBuffer.nCode) {
 				case COMMAND_READY:
@@ -305,6 +283,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine08.m_nInfect = sBuffer.nSize;
+					theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0 , hClient);
 					break;
 				case COMMAND_LOG_TOOL:
 					theApp.m_pDisplayView->m_wndMachine08.m_nRecovery = sBuffer.nSize;
@@ -315,7 +294,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 
 			case 10:
 				theApp.m_pDoc->Version10.AddTail(tmpLog);
-				theApp.m_pDisplayView->m_wndMachine10.ListInsertString(CommandString);
+				theApp.m_pDisplayView->m_wndMachine10.ListInsertString(tmpLog);
 
 				switch (sBuffer.nCode) {
 				case COMMAND_READY:
@@ -323,9 +302,10 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine10.m_nInfect = sBuffer.nSize;
+					theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0, hClient);
 					break;
 				case COMMAND_LOG_TOOL:
-					theApp.m_pDisplayView->m_wndMachine10.m_nRecovery = sBuffer.nSize;
+					 theApp.m_pDisplayView->m_wndMachine10.m_nRecovery = sBuffer.nSize;
 					break;
 				}
 				theApp.m_pDisplayView->m_wndMachine10.InvalidateRect(NULL, 0);

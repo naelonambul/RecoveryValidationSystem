@@ -22,8 +22,8 @@ public:
 	CPtrList Version10;
 
 protected:
-	CString pszSamplePath;
-	CString pszToolPath;
+	CString pszSamplePath = _T(" ");
+	CString pszToolPath = _T(" ");
 	
 	CString transBuffer = _T(" ");
 // Operations
@@ -61,8 +61,8 @@ public:
 	void releasePtrList(CPtrList &nParam);
 	void clearPtrList();
 
-	void SetSamplePath(CString cPath);
-	void SetToolPath(CString  cPath);
+	void SetSamplePath(CString &cPath);
+	void SetToolPath(CString  &cPath);
 
 	CString& GetSamplePath();
 	CString& GetToolPath();

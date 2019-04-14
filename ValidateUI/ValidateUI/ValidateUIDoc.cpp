@@ -3,7 +3,7 @@
 //
 
 #include "stdafx.h"
-#include <locale.h>
+#include <locale.h> //kor
 // SHARED_HANDLERS can be defined in an ATL project implementing preview, thumbnail
 // and search filter handlers and allows sharing of document code with that project.
 #ifndef SHARED_HANDLERS
@@ -143,13 +143,13 @@ void CValidateUIDoc::Dump(CDumpContext& dc) const
 // CValidateUIDoc commands
 
 
-void CValidateUIDoc::SetSamplePath(CString cPath)
+void CValidateUIDoc::SetSamplePath(CString &cPath)
 {
 	pszSamplePath = cPath;
 }
 
 
-void CValidateUIDoc::SetToolPath(CString  cPath)
+void CValidateUIDoc::SetToolPath(CString  &cPath)
 {
 	pszToolPath = cPath;
 }

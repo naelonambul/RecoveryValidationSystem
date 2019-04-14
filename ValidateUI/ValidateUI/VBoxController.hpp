@@ -22,6 +22,9 @@ using std::regex_search;
 #define VBOX_CONTROLLER_HPP
 
 typedef enum MYVM_COMMAND {
+	WMRUNNING = 0,
+	WMREADY = 1,
+
 	VMSTART = 100,
 	VMSTOP = 101,
 	VMRECOVERYSNAP = 102,
@@ -34,6 +37,9 @@ namespace VBox
 	class Controller 
 	{
 	public:
+		int nRunning = WMREADY; //Ready = 0
+		int nRunMachine = 0;	//up to 3
+
 		CString MyProgramFilesPath;
 		CString MyCommand;
 		CString FileOutPut;
@@ -89,6 +95,7 @@ namespace VBox
 
 		void Run(int nOrder)
 		{
+			nRunning = WMRUNNING;
 			makeTailCommand(nOrder);
 			FILE* fp = RunShellCommand(MyCommand, READ_MODE);
 
@@ -101,6 +108,27 @@ namespace VBox
 
 				string str((char*)buffer);
 
+
+				//parsing error
+				string ReturnPipe;
+				if (nOrder != VMSTOP)
+				{
+					if (regexPipe(str, "^error:\\s+(.*)\r\n", ReturnPipe))
+						AfxMessageBox(_T("ERROR"));
+				}
+
+				if (nOrder == VMRECOVERYSNAP)
+				{
+					if (strcmp((char*)buffer, "100%"))
+					--nRunMachine;
+				}
+
+				if (nOrder == VMSTART)
+				{
+					if(strcmp((char*)buffer, "successfully started"))
+					nRunMachine++;
+				}
+
 				if (nOrder == VMLIST) //parsing vm list
 				{
 					string FoundName;
@@ -110,15 +138,10 @@ namespace VBox
 					if (FoundName != "" && FoundOS != "")
 						mapOS.insert(pair<string, string>(FoundName, FoundOS));
 				}
-				//parsing error
-				string ReturnPipe;
-				if (nOrder != VMSTOP)
-				{
-					regexPipe(str, "error:(.*)\r\n", ReturnPipe);
-					//AfxMessageBox(CString(ReturnPipe.c_str()));
-				}
+
+				memset(buffer, 0, sizeof(buffer));
 			}
-			Sleep(1);
+			nRunning = WMREADY;
 		}
 
 		bool regexPipe(string& sTarget, const char* sentence, string& sFound)

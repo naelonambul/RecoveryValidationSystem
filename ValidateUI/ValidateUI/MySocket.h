@@ -26,8 +26,9 @@ public:
 
 	SOCKET Get_hSocket(); 
 	SOCKET Get_cSocket();
-	BOOL SendCommand(int nCommandCode, int Size);
-	BOOL SendFile(CString& cFilePath);
+	BOOL SendCommandToAll(int nCommandCode, int Size);
+	BOOL SendFileToAll(CString& cFilePath);
 
 	HANDLE fileEvent;
+	void SendCommandToOne(int nCommandCode, int Size, SOCKET cSocket);
 };

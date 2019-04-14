@@ -195,7 +195,7 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 
 	RETURNMESSAGE Error;
 	Error.nCode = agentData->previousCommand;
-	 _tcscpy(Error.szDesc,  str);
+	 _tcscpy_s(Error.szDesc,  str);
 
 	if (hSocket != NULL)
 	{
@@ -411,7 +411,7 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 		dwChangeHandles[0] = FindFirstChangeNotification(
 			lpDir,
 			FALSE,
-			FILE_NOTIFY_CHANGE_FILE_NAME);
+			FILE_NOTIFY_CHANGE_LAST_WRITE);
 
 		if (dwChangeHandles[0] == INVALID_HANDLE_VALUE)
 		{

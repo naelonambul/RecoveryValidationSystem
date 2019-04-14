@@ -125,7 +125,7 @@ void CMySocket::InitCS()
 	::InitializeCriticalSection(&m_cs);
 }
 
-BOOL CMySocket::SendCommand(int nCommandCode, int Size)
+BOOL CMySocket::SendCommandToAll(int nCommandCode, int Size)
 {
 	POSITION pos = m_listClient.GetHeadPosition();
 	SOCKET sClient = NULL;
@@ -147,7 +147,19 @@ BOOL CMySocket::SendCommand(int nCommandCode, int Size)
 }
 
 
-BOOL CMySocket::SendFile(CString& cFilePath)
+void CMySocket::SendCommandToOne(int nCommandCode, int Size, SOCKET cSocket)
+{
+	MYCOMMAND Cmd;
+	Cmd.nCode = nCommandCode;
+	Cmd.nSize = 0;
+	Cmd.nVersion = 0;
+
+	::send(cSocket, reinterpret_cast<char*>(&Cmd), sizeof(Cmd), 0);
+}
+
+
+
+BOOL CMySocket::SendFileToAll(CString& cFilePath)
 {
 		POSITION pos = m_listClient.GetHeadPosition();
 		SOCKET sClient = NULL;

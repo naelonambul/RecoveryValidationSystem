@@ -10,6 +10,7 @@
 
 #define MAX_SCREEN_X 1920
 #define MAX_SCREEN_Y 1080
+#define MAX_FNAME 256
 // CFileDlg dialog
 
 IMPLEMENT_DYNAMIC(CFileDlg, CDialogEx)
@@ -72,16 +73,20 @@ void CFileDlg::OnDropFiles(HDROP hDropInfo)
 	// TODO: Add your message handler code here and/or call default
 	PictureChange(IDB_BITMAP_COMPLETE);
 	DWORD nBuffer = 0;
+	TCHAR pszFileName[MAX_FNAME];
 	CString sFile;
 
 	nBuffer = ::DragQueryFile(hDropInfo, 0, NULL, 0);
-	DragQueryFile(hDropInfo, 0, sFile.GetBuffer(nBuffer + 1), nBuffer + 1);
+	DragQueryFile(hDropInfo, 0, pszFileName, sizeof(pszFileName));
+	sFile = pszFileName;
 
 	if (m_pParentView == (CView*)theApp.m_pSampleFileView)
 		theApp.GetValidateDoc()->SetSamplePath(sFile);
 	else if (m_pParentView == (CView*)theApp.m_pRecoveryFileView)
 		theApp.GetValidateDoc()->SetToolPath(sFile);
 	m_bottomString = sFile;
+
+	memset(pszFileName, 0, sizeof(pszFileName));
 	InvalidateRect(NULL, 0);
 	CDialogEx::OnDropFiles(hDropInfo);
 }

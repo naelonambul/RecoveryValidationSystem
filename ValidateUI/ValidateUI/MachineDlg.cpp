@@ -56,13 +56,6 @@ BOOL CMachineDlg::OnEraseBkgnd(CDC* pDC)
 {
 	// TODO: Add your message handler code here and/or call default
 
-	//CBrush backColor(RGB(255, 255, 255));
-	//CBrush* pOldBrush = pDC->SelectObject(&backColor);
-	//CRect ViewRect;
-	//pDC->GetClipBox(&ViewRect);
-	//pDC->PatBlt(ViewRect.left, ViewRect.top, ViewRect.Width(), ViewRect.Height(), PATCOPY);
-	//pDC->SelectObject(pOldBrush);
-
 	return TRUE;
 	//return CDialogEx::OnEraseBkgnd(pDC);
 }
@@ -111,10 +104,33 @@ void CMachineDlg::ListGetCount()
 }
 
 
-void CMachineDlg::ListInsertString(CString pszData)
+void CMachineDlg::ListInsertString(MYLOG* const tmpLog)
 {
-	m_Log_List.InsertString(m_nCount, pszData);
+	CString CommandString;
+	switch (tmpLog->nCode) {
+	case COMMAND_HEALTH:		CommandString.LoadString(IDS_STRING_HEALTH); break;
+	case COMMAND_ERROR: 		CommandString.LoadString(IDS_STRING_ERROR); break;
+	case COMMAND_SND_SAMPLE:	CommandString.LoadString(IDS_STRING_SND_SAMPLE); break;
+	case COMMAND_SND_TOOL:		CommandString.LoadString(IDS_STRING_SND_TOOL); break;
+	case COMMAND_BEGIN_FILE:	CommandString.LoadString(IDS_STRING_BEGIN_FILE); break;
+	case COMMAND_END_FILE:		CommandString.LoadString(IDS_STRING_END_FILE); break;
+	case COMMAND_RUN_SAMPLE:	CommandString.LoadString(IDS_STRING_RUN_SAMPLE); break;
+	case COMMAND_END_SAMPLE:	CommandString.LoadString(IDS_STRING_END_SAMPLE); break;
+	case COMMAND_LOG_SAMPLE:	CommandString.LoadString(IDS_STRING_LOG_SAMPLE); break;
+	case COMMAND_RUN_TOOL:		CommandString.LoadString(IDS_STRING_RUN_TOOL); break;
+	case COMMAND_END_TOOL:		CommandString.LoadString(IDS_STRING_END_TOOL); break;
+	case COMMAND_LOG_TOOL:		CommandString.LoadString(IDS_STRING_LOG_TOOL); break;
+	case COMMAND_STOP:			CommandString.LoadString(IDS_STRING_STOP); break;
+	case COMMAND_READY:			CommandString.LoadString(IDS_STRING_AGENTREADY); break;
+	}
+	//push data doc,ui
+	CTime timeBuffer = tmpLog->cNow;
+	CString strDataTime;
+	strDataTime = timeBuffer.Format(_T("%Y³â%m¿ù%dÀÏ - %I:%M:%S "));
+	CommandString.Insert(0, strDataTime);
+
+	ListGetCount();
+	m_Log_List.InsertString(m_nCount, CommandString);
 	m_Log_List.SetCurSel(m_nCount);
 }
-
 

@@ -32,11 +32,11 @@ void CControlDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CControlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_VMRUN, &CControlDlg::OnBnClickedButtonVmRun)
-	ON_BN_CLICKED(IDC_BUTTON_SAMPLE, &CControlDlg::OnBnClickedButtonSample)
-	ON_BN_CLICKED(IDC_BUTTON_RECOVERY, &CControlDlg::OnBnClickedButtonRecovery)
 	ON_BN_CLICKED(IDC_BUTTON_VMRESET, &CControlDlg::OnBnClickedButtonVmReset)
-	ON_BN_CLICKED(IDC_BUTTON_EXPORT, &CControlDlg::OnBnClickedButtonExport)
 	ON_BN_CLICKED(IDC_BUTTON_SENDFILE, &CControlDlg::OnBnClickedButtonSendfile)
+	ON_MESSAGE(WM_USER_07READY, &CControlDlg::OnUser07ready)
+	ON_MESSAGE(WM_USER_08READY, &CControlDlg::OnUser08ready)
+	ON_MESSAGE(WM_USER_10READY, &CControlDlg::OnUser10ready)
 END_MESSAGE_MAP()
 
 
@@ -77,83 +77,49 @@ void CControlDlg::OnBnClickedButtonVmRun()
 	m_comboOSList.GetWindowText(myCurSel);
 	nIndex = m_comboOSList.GetCurSel();
 
-	m_comboOSList.DeleteString(nIndex);
+	if (nIndex != CB_ERR)	{
+		m_comboOSList.DeleteString(nIndex);
 
-	//GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE);
+		GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 
-	//GetDlgItem(IDC_BUTTON_SAMPLE)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_RECOVERY)->EnableWindow(FALSE);
-	//
-	//GetDlgItem(IDC_BUTTON_VMRESET)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_EXPORT)->EnableWindow(FALSE);
-	Win.SetCurrentOS(myCurSel);
-	Win.Run(VMSTOP);
-	Sleep(100);
+		Win.SetCurrentOS(myCurSel);
+		Win.Run(VMSTOP);
+		Sleep(1000);
 
-	Win.Run(VMSTART);
-	Sleep(100);
+		Win.Run(VMSTART);
+		Sleep(1000);
+		GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE);
+		//준비된거 확인후.
+		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE);
+	}
 }
 
 
 void CControlDlg::OnBnClickedButtonSendfile()
 {
 	// TODO: Add your control notification handler code here
-	//GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE);
 
-	//GetDlgItem(IDC_BUTTON_SAMPLE)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_RECOVERY)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_VMRESET)->EnableWindow(TRUE);
-	//
-	//GetDlgItem(IDC_BUTTON_EXPORT)->EnableWindow(FALSE);
+	if (theApp.m_pDoc->GetSamplePath() != "" ||
+		theApp.m_pDoc->GetToolPath() != "" && Win.nRunning) {
+		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
+		GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 
-	if (theApp.m_pDoc->GetSamplePath() != "" &&
-		theApp.m_pDoc->GetToolPath() != "") {
-		theApp.m_sCommand.SendCommand(COMMAND_SND_SAMPLE, 0);
-		theApp.m_sCommand.SendFile(theApp.m_pDoc->GetSamplePath());
+		theApp.m_sCommand.SendCommandToAll(COMMAND_SND_SAMPLE, 0);
+		theApp.m_sCommand.SendFileToAll(theApp.m_pDoc->GetSamplePath());
 		Sleep(1000);
-		theApp.m_sCommand.SendCommand(COMMAND_SND_TOOL, 0);
-		theApp.m_sCommand.SendFile(theApp.m_pDoc->GetToolPath());
+		theApp.m_sCommand.SendCommandToAll(COMMAND_SND_TOOL, 0);
+		theApp.m_sCommand.SendFileToAll(theApp.m_pDoc->GetToolPath());
 		Sleep(1000);
-		theApp.m_sCommand.SendCommand(COMMAND_RUN_SAMPLE, 0);
-		Sleep(1000);
-		theApp.m_sCommand.SendCommand(COMMAND_RUN_TOOL, 0);
+		theApp.m_sCommand.SendCommandToAll(COMMAND_RUN_SAMPLE, 0);
+		if(nReady == 3)
+			GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
+	}
+	else if (!Win.nRunning) {
+		AfxMessageBox(_T("가상머신이 작동중입니다."));
 	}
 	else
 		AfxMessageBox(_T("파일 경로를 확인해 주세요."));
-	//SetEvent(theApp.m_sCommand.fileEvent);
-
-}
-
-void CControlDlg::OnBnClickedButtonSample()
-{
-	// TODO: Add your control notification handler code here
-	//GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
-
-	//GetDlgItem(IDC_BUTTON_SAMPLE)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_RECOVERY)->EnableWindow(TRUE);
-	//
-	//GetDlgItem(IDC_BUTTON_VMRESET)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_EXPORT)->EnableWindow(FALSE);
-
-
-}
-
-
-void CControlDlg::OnBnClickedButtonRecovery()
-{
-	// TODO: Add your control notification handler code here
-	//GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
-
-	//GetDlgItem(IDC_BUTTON_SAMPLE)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_RECOVERY)->EnableWindow(FALSE);
-	//
-	//GetDlgItem(IDC_BUTTON_VMRESET)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_EXPORT)->EnableWindow(FALSE);
-
 
 }
 
@@ -161,32 +127,13 @@ void CControlDlg::OnBnClickedButtonRecovery()
 void CControlDlg::OnBnClickedButtonVmReset()
 {
 	// TODO: Add your control notification handler code here
-	//GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
-
-	//GetDlgItem(IDC_BUTTON_SAMPLE)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_RECOVERY)->EnableWindow(FALSE);
-
-	//GetDlgItem(IDC_BUTTON_VMRESET)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_EXPORT)->EnableWindow(TRUE);
+	GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
+	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 
 	ResetOSList();
 	Win.exitVM();
-}
 
-
-void CControlDlg::OnBnClickedButtonExport()
-{
-	// TODO: Add your control notification handler code here
-	//GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE);
-	//GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
-
-	//GetDlgItem(IDC_BUTTON_SAMPLE)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_RECOVERY)->EnableWindow(FALSE);
-
-	//GetDlgItem(IDC_BUTTON_VMRESET)->EnableWindow(FALSE);
-	//GetDlgItem(IDC_BUTTON_EXPORT)->EnableWindow(FALSE);
-
+	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE);
 	theApp.m_pDoc->exportCSV();
 }
 
@@ -218,4 +165,34 @@ void CControlDlg::AddReady()
 BOOL CControlDlg::IsReady()
 {
 	return nReady == 3;
+}
+
+
+afx_msg LRESULT CControlDlg::OnUser07ready(WPARAM wParam, LPARAM lParam)
+{
+	if (n07Ready) n07Ready = 0;
+	else n07Ready = 1;
+
+	AddReady();
+	return 0;
+}
+
+
+afx_msg LRESULT CControlDlg::OnUser08ready(WPARAM wParam, LPARAM lParam)
+{
+	if (n08Ready) n08Ready = 0;
+	else n08Ready = 1;
+
+	AddReady();
+	return 0;
+}
+
+
+afx_msg LRESULT CControlDlg::OnUser10ready(WPARAM wParam, LPARAM lParam)
+{
+	if (n10Ready) n10Ready = 0;
+	else n10Ready = 1;
+
+	AddReady();
+	return 0;
 }

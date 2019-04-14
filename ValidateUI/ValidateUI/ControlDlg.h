@@ -11,11 +11,19 @@ class CControlDlg : public CDialogEx
 //Attributes
 public:
 	int nReady = 0;
+
+	int n07Ready = 0;
+	int n08Ready = 0;
+	int n10Ready = 0;
+
+
 	int nMachineNumber = 0;
+
+	VBox::Controller Win;
+
 private:
 	CComboBox m_comboOSList;
 
-	VBox::Controller Win;
 
 	int nIndex = 0;
 public:
@@ -37,11 +45,12 @@ public:
 	virtual BOOL PreTranslateMessage(MSG* pMsg);
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonVmRun();
-	afx_msg void OnBnClickedButtonSample();
-	afx_msg void OnBnClickedButtonRecovery();
 	afx_msg void OnBnClickedButtonVmReset();
-	afx_msg void OnBnClickedButtonExport();
 	afx_msg void OnBnClickedButtonSendfile();
 	void AddReady();
 	BOOL IsReady();
+protected:
+	afx_msg LRESULT OnUser07ready(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUser08ready(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUser10ready(WPARAM wParam, LPARAM lParam);
 };

@@ -1,7 +1,7 @@
 #pragma once
 #include "afxwin.h"
 
-
+struct MYLOG;
 // CMachineDlg dialog
 
 class CMachineDlg : public CDialogEx
@@ -45,5 +45,5 @@ public:
 
 	void PictureChange(int IDB_NUM);
 	void ListGetCount();
-	void CMachineDlg::ListInsertString(CString pszData);
+	void CMachineDlg::ListInsertString(MYLOG* const tmpLog);
 };
