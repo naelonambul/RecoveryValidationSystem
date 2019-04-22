@@ -21,6 +21,9 @@ CControlDlg::CControlDlg(CWnd* pParent /*=NULL*/)
 
 CControlDlg::~CControlDlg()
 {
+	pVboxThread->PostThreadMessage(WM_USER_STOP, NULL, NULL);
+	WaitForSingleObject(waitMsg, 300);
+
 }
 
 void CControlDlg::DoDataExchange(CDataExchange* pDX)
@@ -61,8 +64,22 @@ BOOL CControlDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
-	Win.GetProgramFilesPath();
-	Win.Run(VMLIST);
+
+	//Create Event for Sync
+	waitMsg = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+	//Create Thread for Vbox
+	pVboxThread = AfxBeginThread(
+		CControlDlg::ThreadBox,
+		this,
+		NULL,
+		NULL,
+		NULL,
+		NULL);
+
+	pVboxThread->PostThreadMessage(WM_USER_VMREADY, NULL, NULL);
+	WaitForSingleObject(waitMsg, INFINITE);
+
 	ResetOSList();
 	m_comboOSList.SetCurSel(0);
 	return TRUE;  // return TRUE unless you set the focus to a control
@@ -84,15 +101,16 @@ void CControlDlg::OnBnClickedButtonVmRun()
 		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 
 		Win.SetCurrentOS(myCurSel);
-		Win.Run(VMSTOP);
-		Sleep(1000);
 
-		Win.Run(VMSTART);
-		Sleep(1000);
-		GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE);
-		//준비된거 확인후.
-		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE);
+		pVboxThread->PostThreadMessage(WM_USER_VMSTOP, NULL, NULL);
+		WaitForSingleObject(waitMsg, INFINITE);
+
+		pVboxThread->PostThreadMessage(WM_USER_VMSTART, NULL, NULL);
+		WaitForSingleObject(waitMsg, INFINITE);
 	}
+	Sleep(900);
+	if (Win.nRunMachine >= 3){	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);	}
+	else { GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE); }
 }
 
 
@@ -100,8 +118,10 @@ void CControlDlg::OnBnClickedButtonSendfile()
 {
 	// TODO: Add your control notification handler code here
 
-	if (theApp.m_pDoc->GetSamplePath() != "" ||
-		theApp.m_pDoc->GetToolPath() != "" && Win.nRunning) {
+	CString StartString;
+
+	if (theApp.m_pDoc->GetSamplePath() != theApp.m_pDoc->GetToolPath()
+		&& nReady) {
 		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 
@@ -112,15 +132,18 @@ void CControlDlg::OnBnClickedButtonSendfile()
 		theApp.m_sCommand.SendFileToAll(theApp.m_pDoc->GetToolPath());
 		Sleep(1000);
 		theApp.m_sCommand.SendCommandToAll(COMMAND_RUN_SAMPLE, 0);
-		if(nReady == 3)
+
+		if (nReady >= 3) {
 			GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
+			GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
+		}
 	}
 	else if (!Win.nRunning) {
-		AfxMessageBox(_T("가상머신이 작동중입니다."));
+		AfxMessageBox(StartString.LoadStringW(IDS_STRING_VM_RUNNING));
 	}
-	else
-		AfxMessageBox(_T("파일 경로를 확인해 주세요."));
-
+	else {
+	AfxMessageBox(StartString.LoadStringW(IDS_STRING_FILEPATH));
+	}
 }
 
 
@@ -130,11 +153,15 @@ void CControlDlg::OnBnClickedButtonVmReset()
 	GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 
+
+	pVboxThread->PostThreadMessage(WM_USER_VMEXIT, NULL, NULL);
+	WaitForSingleObject(waitMsg, INFINITE);
+
 	ResetOSList();
-	Win.exitVM();
 
 	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE);
 	theApp.m_pDoc->exportCSV();
+	nReady = 0;//reset count
 }
 
 
@@ -143,13 +170,9 @@ void CControlDlg::ResetOSList()
 	m_comboOSList.ResetContent();
 
 	map<string, string> ::iterator PrintIter;
-	if (Win.mapOS.empty() == FALSE)
-	{
-		for (PrintIter = Win.mapOS.begin();
-			PrintIter != Win.mapOS.end();
-			PrintIter++) {
-			wstring printBuffer = wstring(
-				PrintIter->first.begin(), PrintIter->first.end());
+	if (Win.mapOS.empty() == FALSE)	{
+		for (PrintIter = Win.mapOS.begin();	PrintIter != Win.mapOS.end(); PrintIter++) {
+			wstring printBuffer = wstring(	PrintIter->first.begin(), PrintIter->first.end());
 			const wchar_t* result = printBuffer.c_str();
 			m_comboOSList.AddString(result);
 		}
@@ -164,7 +187,7 @@ void CControlDlg::AddReady()
 
 BOOL CControlDlg::IsReady()
 {
-	return nReady == 3;
+	return nReady == Win.nRunMachine;
 }
 
 
@@ -174,6 +197,9 @@ afx_msg LRESULT CControlDlg::OnUser07ready(WPARAM wParam, LPARAM lParam)
 	else n07Ready = 1;
 
 	AddReady();
+	if (IsReady()) { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE); }
+	else { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE); }
+
 	return 0;
 }
 
@@ -184,6 +210,8 @@ afx_msg LRESULT CControlDlg::OnUser08ready(WPARAM wParam, LPARAM lParam)
 	else n08Ready = 1;
 
 	AddReady();
+	if (IsReady()) { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE); }
+	else { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE); }
 	return 0;
 }
 
@@ -194,5 +222,48 @@ afx_msg LRESULT CControlDlg::OnUser10ready(WPARAM wParam, LPARAM lParam)
 	else n10Ready = 1;
 
 	AddReady();
+	if (IsReady()) { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE); }
+	else { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE); }
 	return 0;
+}
+
+
+UINT CControlDlg::ThreadBox(LPVOID pParam)
+{
+	CControlDlg* pDlg = (CControlDlg*)pParam;
+
+	MSG msg;
+	while (GetMessage(&msg, NULL, 0, 0))
+	{
+		switch (msg.message)
+		{
+		case WM_USER_VMREADY: 
+			pDlg->Win.GetProgramFilesPath();
+			pDlg->Win.Run(VMLIST);
+			SetEvent(pDlg->waitMsg);
+			break;
+		case WM_USER_VMSTOP: 
+			pDlg->Win.Run(VMSTOP);
+			SetEvent(pDlg->waitMsg);
+			break;
+		case WM_USER_VMSTART: 
+			pDlg->Win.Run(VMSTART);
+			SetEvent(pDlg->waitMsg);
+			break;
+		case WM_USER_VMEXIT: 
+			pDlg->Win.exitVM();
+			SetEvent(pDlg->waitMsg);
+			break;
+		case WM_USER_STOP:  
+			SetEvent(pDlg->waitMsg);
+			return 0;
+		default:
+			break;
+		}
+
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
+	
+	return 3;
 }

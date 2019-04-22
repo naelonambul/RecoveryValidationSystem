@@ -50,7 +50,8 @@
 #define IDS_STRING_RCVOFILE             50018
 #define IDS_STRING_RECOVEFILE           50018
 #define IDS_STRING_AGENTREADY           50019
-#define IDS_STRING_L_HEALTH             50020
+#define IDS_STRING_VM_RUNNING           50020
+#define IDS_STRING_FILEPATH             50021
 
 // Next default values for new objects
 // 

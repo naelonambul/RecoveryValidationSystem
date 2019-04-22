@@ -191,7 +191,6 @@ BOOL CMySocket::SendFileToAll(CString& cFilePath)
 			tfsb.Head = &myData;
 			tfsb.HeadLength = sizeof(myData);
 
-
 			sClient = m_listClient.GetNext(pos);
 			if (sClient != NULL) {
 				if(::TransmitFile(

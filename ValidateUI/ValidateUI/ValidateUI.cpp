@@ -139,8 +139,10 @@ BOOL CValidateUIApp::InitInstance()
 	{
 		AfxMessageBox(_T("Failed WSASStartup"));
 	}
+	//accept thread create
 	CWinThread *pAcceptThread = AfxBeginThread(CValidateUIApp::ThreadAccept, this);
 	
+	//need to disconnect for virus spread
 	AfxMessageBox(IDS_STRING_READY);
 
 	return TRUE;
@@ -233,7 +235,8 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 
 	//for connection check
 	struct timeval tv = { 0 };
-	tv.tv_sec = 12000;
+	//2 minutes
+	tv.tv_sec = 120000;
 
 	setsockopt(hClient, SOL_SOCKET, SO_RCVTIMEO, (char*)&tv, sizeof(struct timeval));
 
@@ -261,6 +264,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 				case COMMAND_READY:
 					//UI Begin 
 					theApp.m_pDisplayView->m_wndMachine07.m_nFile = sBuffer.nSize;
+					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_07READY, NULL, NULL);
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine07.m_nInfect = sBuffer.nSize;
@@ -280,6 +284,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 				switch (sBuffer.nCode) {
 				case COMMAND_READY:
 					theApp.m_pDisplayView->m_wndMachine08.m_nFile = sBuffer.nSize;
+					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_08READY, NULL, NULL);
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine08.m_nInfect = sBuffer.nSize;
@@ -299,6 +304,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 				switch (sBuffer.nCode) {
 				case COMMAND_READY:
 					theApp.m_pDisplayView->m_wndMachine10.m_nFile = sBuffer.nSize;
+					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_10READY, NULL, NULL);
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine10.m_nInfect = sBuffer.nSize;
@@ -317,20 +323,20 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 			}
 		}
 
-		if(sBuffer.nCode == COMMAND_ERROR)
-			//에러 코드 관리.
-
+		if (sBuffer.nCode == COMMAND_ERROR)
+		{
+			
+		}
 		memset((void*)&sBuffer, 0, sizeof(sBuffer));
 	}
 
-
-	::EnterCriticalSection(&mySocket->m_cs);		
+	::EnterCriticalSection(&mySocket->m_cs);	
 
 	POSITION pos = mySocket->m_listClient.Find(hClient);
 	if (pos != NULL)
 		mySocket->m_listClient.RemoveAt(pos);
 
-	::LeaveCriticalSection(&mySocket->m_cs);		
+	::LeaveCriticalSection(&mySocket->m_cs);
 	::closesocket(hClient);
 
 	CString myError;

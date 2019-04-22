@@ -123,7 +123,7 @@ void CMachineDlg::ListInsertString(MYLOG* const tmpLog)
 	case COMMAND_STOP:			CommandString.LoadString(IDS_STRING_STOP); break;
 	case COMMAND_READY:			CommandString.LoadString(IDS_STRING_AGENTREADY); break;
 	}
-	//push data doc,ui
+	//push data doc
 	CTime timeBuffer = tmpLog->cNow;
 	CString strDataTime;
 	strDataTime = timeBuffer.Format(_T("%Y³â%m¿ù%dÀÏ - %I:%M:%S "));

@@ -10,7 +10,6 @@
 
 #define MAX_SCREEN_X 1920
 #define MAX_SCREEN_Y 1080
-#define MAX_FNAME 256
 // CFileDlg dialog
 
 IMPLEMENT_DYNAMIC(CFileDlg, CDialogEx)
@@ -63,7 +62,7 @@ void CFileDlg::PictureChange(int IDB_NUM)
 	HBITMAP h_old_bitmap = m_pPicture1->SetBitmap(new_image);
 	if (h_old_bitmap != NULL)
 		::DeleteObject(h_old_bitmap);
-	
+
 	new_image.Detach();
 }
 
@@ -71,30 +70,48 @@ void CFileDlg::PictureChange(int IDB_NUM)
 void CFileDlg::OnDropFiles(HDROP hDropInfo)
 {
 	// TODO: Add your message handler code here and/or call default
-	PictureChange(IDB_BITMAP_COMPLETE);
 	DWORD nBuffer = 0;
-	TCHAR pszFileName[MAX_FNAME];
-	CString sFile;
+	TCHAR pszFilePath[_MAX_FNAME];
+	TCHAR pszFileName[_MAX_FNAME];
+	TCHAR pszFileExt[_MAX_EXT];
 
 	nBuffer = ::DragQueryFile(hDropInfo, 0, NULL, 0);
-	DragQueryFile(hDropInfo, 0, pszFileName, sizeof(pszFileName));
-	sFile = pszFileName;
+	DragQueryFile(hDropInfo, 0, pszFilePath, sizeof(pszFilePath));
+	_tsplitpath_s(pszFilePath,
+		NULL, NULL,
+		NULL, NULL,
+		pszFileName, _MAX_FNAME,
+		pszFileExt, _MAX_EXT);
 
-	if (m_pParentView == (CView*)theApp.m_pSampleFileView)
-		theApp.GetValidateDoc()->SetSamplePath(sFile);
-	else if (m_pParentView == (CView*)theApp.m_pRecoveryFileView)
-		theApp.GetValidateDoc()->SetToolPath(sFile);
-	m_bottomString = sFile;
+	CString sFilePath(pszFilePath);
+	CString sFileName(pszFileName);
+	sFileName.Append(pszFileExt);
 
-	memset(pszFileName, 0, sizeof(pszFileName));
-	InvalidateRect(NULL, 0);
+	//exe filter
+	if (_tcscmp(pszFileExt, _T(".exe")) == 0)	{
+		if (m_pParentView == (CView*)theApp.m_pSampleFileView)
+			theApp.GetValidateDoc()->SetSamplePath(sFilePath);
+		else if (m_pParentView == (CView*)theApp.m_pRecoveryFileView)
+			theApp.GetValidateDoc()->SetToolPath(sFilePath);
+
+		PictureChange(IDB_BITMAP_COMPLETE);
+		m_bottomString = sFileName;
+		
+		InvalidateRect(NULL, 0);
+	}
+	else	{
+		AfxMessageBox(_T("exe 파일이 필요합니다."));
+
+	}
 	CDialogEx::OnDropFiles(hDropInfo);
 }
 
 
 void CFileDlg::SetPen()
 {
-	m_FileDlgpen.CreatePen(PS_SOLID, 15, RGB(0, 0, 0));
+	GetFont()->GetLogFont(&m_dlgLf);
+	m_dlgLf.lfHeight = 15;
+	m_dlgFont.CreateFontIndirect(&m_dlgLf);
 }
 
 
@@ -104,7 +121,7 @@ int CFileDlg::OnCreate(LPCREATESTRUCT lpCreateStruct)
 		return -1;
 
 	// TODO:  Add your specialized creation code here
-	SetPen();
+
 	return 0;
 }
 
@@ -124,7 +141,7 @@ void CFileDlg::OnPaint()
 	CPaintDC dc(this); // device context for painting
 					   // TODO: Add your message handler code here
 					   // Do not call CDialogEx::OnPaint() for painting messages
-
+	SetPen();
 	CDC *mypDC = &dc;
 	if (pOldBitmap == nullptr)
 	{
@@ -139,11 +156,21 @@ void CFileDlg::OnPaint()
 	memdc.GetClipBox(&ViewRect);
 	memdc.PatBlt(ViewRect.left, ViewRect.top, ViewRect.Width(), ViewRect.Height(), PATCOPY);
 	memdc.SelectObject(pOldBrush);
-	memdc.SelectObject(m_FileDlgpen);
+	m_pOldFont = memdc.SelectObject(&m_dlgFont);
 	memdc.SetBkMode(TRANSPARENT);
-	memdc.TextOutW(20, 20, m_bottomString);
 
+	if (m_bottomString == "") 
+	{
+		CString GuideString;
+		if (m_pParentView == (CView*)theApp.m_pSampleFileView)
+			GuideString.LoadStringW(IDS_STRING_DROPSAMPLE);
+		else if (m_pParentView == (CView*)theApp.m_pRecoveryFileView)
+			GuideString.LoadStringW(IDS_STRING_DROPTOOL);
 
+		m_bottomString = GuideString;
+	}
+	memdc.TextOut(15, 23, m_bottomString);
+	memdc.SelectObject(m_pOldFont);
 	dc.BitBlt(0, 0, MAX_SCREEN_X, MAX_SCREEN_Y,
 		&memdc, 0, 0, SRCCOPY);
 }

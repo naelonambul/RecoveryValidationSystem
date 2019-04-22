@@ -22,8 +22,8 @@ public:
 	CPtrList Version10;
 
 protected:
-	CString pszSamplePath = _T(" ");
-	CString pszToolPath = _T(" ");
+	CString pszSamplePath = _T("");
+	CString pszToolPath = _T("");
 	
 	CString transBuffer = _T(" ");
 // Operations

@@ -14,9 +14,12 @@ public:
 private:
 	CBitmap new_image;
 	
-	CPen m_FileDlgpen;
-	CPen *m_pOldpen;
-	CString m_bottomString = _T("Drag & Drop Your File");
+	CFont m_dlgFont;
+	LOGFONT m_dlgLf;
+
+	CFont* m_pOldFont;
+
+	CString m_bottomString;
 	CString m_Hash;
 
 	CDC memdc;

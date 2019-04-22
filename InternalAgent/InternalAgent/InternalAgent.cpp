@@ -266,9 +266,9 @@ int p_END_SAMPLEfuc(cDataStruct *agentData, SOCKET hSocket)
 	agentData->DisPlayMap(agentData->Sample_After());
 	puts("");
 	//Compare Hash
-	agentData->m_nCountFile =CompareMap(agentData->Sample_After(), agentData->Sample_Before());
+	agentData->m_nCountFile = agentData->m_nCountFile - CompareMap(agentData->Sample_After(), agentData->Sample_Before());
 	//Send Log
-	printf("Same File :%d\n", agentData->m_nCountFile);
+	printf("Different File :%d\n", agentData->m_nCountFile);
 	SendCommand(COMMAND_LOG_SAMPLE, agentData, hSocket);
 
 	return 1;

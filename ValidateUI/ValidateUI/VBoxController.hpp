@@ -31,162 +31,144 @@ typedef enum MYVM_COMMAND {
 	VMLIST = 103
 } MYVM_COMMAND;
 
-namespace VBox 
+namespace VBox {
+class Controller 
 {
+public:
+	int nRunning = WMREADY; //Ready = 0, Busy = 1
+	int nRunMachine = 0;	//up to 3
 
-	class Controller 
-	{
-	public:
-		int nRunning = WMREADY; //Ready = 0
-		int nRunMachine = 0;	//up to 3
+	CString MyProgramFilesPath;
+	CString MyCommand;
+	CString FileOutPut;
 
-		CString MyProgramFilesPath;
-		CString MyCommand;
-		CString FileOutPut;
+	CString cCurrentOS;
 
-		CString cCurrentOS;
+	map<string, string> mapOS;
 
-		map<string, string> mapOS;
+	CPtrList outputCommand;
+public:
+	void GetProgramFilesPath() {
+		TCHAR path[MAX_PATH] = { 0 };
+		ExpandEnvironmentStrings(_T("%ProgramW6432%"), path, sizeof(path));
+		
+		MyProgramFilesPath = _T("\"");
+		MyProgramFilesPath += path;
+		MyProgramFilesPath += _T("\\Oracle\\VirtualBox\\VBoxManage.exe");
+		MyProgramFilesPath += _T("\"");
+	}
 
-		CPtrList outputCommand;
-	public:
-		void GetProgramFilesPath() {
-			TCHAR path[MAX_PATH] = { 0 };
-			ExpandEnvironmentStrings(_T("%ProgramW6432%"), path, sizeof(path));
-			
-			MyProgramFilesPath = _T("\"");
-			MyProgramFilesPath += path;
-			MyProgramFilesPath += _T("\\Oracle\\VirtualBox\\VBoxManage.exe");
-			MyProgramFilesPath += _T("\"");
-		}
+	bool ExistFile() {
+		const int existFile = _taccess(MyProgramFilesPath, 0x00);
 
-		bool ExistFile() {
-			const int existFile = _taccess(MyProgramFilesPath, 0x00);
+		return (0 == existFile);
+	}
 
-			return (0 == existFile);
-		}
+	void makeTailCommand(int nOrder)	{
+		MyCommand = MyProgramFilesPath;
 
-		void makeTailCommand(int nOrder)
-		{
-			MyCommand = MyProgramFilesPath;
+		switch (nOrder)		{
+		case	VMSTART:	MyCommand += " startvm ";
+							MyCommand += cCurrentOS;
+							MyCommand += " --type headless";
+							break;
+		
+		case	VMSTOP:		MyCommand += " controlvm ";
+							MyCommand += cCurrentOS; 
+							MyCommand += " poweroff "; 
+							break;
 
-			switch (nOrder)
-			{
-			case	VMSTART:	MyCommand += " startvm ";
+		case	VMRECOVERYSNAP:	MyCommand += " snapshot ";
 								MyCommand += cCurrentOS;
-								//MyCommand += " --type headless";
-								break;
-			
-			case	VMSTOP:		MyCommand += " controlvm ";
-								MyCommand += cCurrentOS; 
-								MyCommand += " poweroff "; 
+								MyCommand += " restore \"Recovery\" ";
 								break;
 
-			case	VMRECOVERYSNAP:	MyCommand += " snapshot ";
-									MyCommand += cCurrentOS;
-									MyCommand += " restore \"Recovery\" ";
-									break;
-
-			case	VMLIST		:	MyCommand += " list -l vms";
-									break;
-			}
+		case	VMLIST		:	MyCommand += " list -l vms";
+								break;
 		}
+	}
 
 
-		void Run(int nOrder)
-		{
-			nRunning = WMRUNNING;
-			makeTailCommand(nOrder);
-			FILE* fp = RunShellCommand(MyCommand, READ_MODE);
+	void Run(int nOrder)	{
+		nRunning = WMRUNNING;
+		makeTailCommand(nOrder);
+		FILE* fp = RunShellCommand(MyCommand, READ_MODE);
 
-			unsigned char buffer[1024 + 1] = { 0 };
-			size_t count = 0;
+		unsigned char buffer[1024 + 1] = { 0 };
+		size_t count = 0;
 
-			while (!feof(fp)) {
-				count = fread(&buffer, 1, sizeof(buffer) - 1, fp);
-				buffer[count] = '\0';
+		while (!feof(fp)) {
+			count = fread(&buffer, 1, sizeof(buffer) - 1, fp);
+			buffer[count] = '\0';
 
-				string str((char*)buffer);
+			string str((char*)buffer);
 
+			string ReturnPipe;
 
-				//parsing error
-				string ReturnPipe;
-				if (nOrder != VMSTOP)
-				{
-					if (regexPipe(str, "^error:\\s+(.*)\r\n", ReturnPipe))
-						AfxMessageBox(_T("ERROR"));
-				}
-
-				if (nOrder == VMRECOVERYSNAP)
-				{
-					if (strcmp((char*)buffer, "100%"))
-					--nRunMachine;
-				}
-
-				if (nOrder == VMSTART)
-				{
-					if(strcmp((char*)buffer, "successfully started"))
-					nRunMachine++;
-				}
-
-				if (nOrder == VMLIST) //parsing vm list
-				{
-					string FoundName;
-					string FoundOS;
-					regexPipe(str, "^Name:\\s+(.*)\r\n", FoundName);
-					regexPipe(str, "^Guest OS:\\s+(.*)\r\n", FoundOS);
-					if (FoundName != "" && FoundOS != "")
-						mapOS.insert(pair<string, string>(FoundName, FoundOS));
-				}
-
-				memset(buffer, 0, sizeof(buffer));
-			}
-			nRunning = WMREADY;
-		}
-
-		bool regexPipe(string& sTarget, const char* sentence, string& sFound)
-		{
-			regex regName(sentence);
-			smatch m;
-			if (regex_search(sTarget, m, regName)) {
-				for (auto& buffer : m)
-					sFound = buffer;
+			//parsing error
+			if (nOrder != VMSTOP)	{	
+				if (regexPipe(str, "^error:\\s+(.*)\r\n", ReturnPipe))
+					AfxMessageBox(_T("ERROR"));
 			}
 
-			if (sFound == "")	return false;
-			else				return true;
+			if (nOrder == VMRECOVERYSNAP)	{
+				if (strcmp((char*)buffer, "100%"))
+				--nRunMachine;
+			}
+
+			if (nOrder == VMSTART)	{
+				if(strcmp((char*)buffer, "successfully started"))
+				nRunMachine++;
+			}
+			//parsing vm list
+			if (nOrder == VMLIST)	{  
+				string FoundName;
+				string FoundOS;
+				regexPipe(str, "^Name:\\s+(.*)\r\n", FoundName);
+				regexPipe(str, "^Guest OS:\\s+(.*)\r\n", FoundOS);
+				if (FoundName != "" && FoundOS != "")
+					mapOS.insert(pair<string, string>(FoundName, FoundOS));
+			}
+			memset(buffer, 0, sizeof(buffer));
+		}
+		nRunning = WMREADY;
+	}
+
+	bool regexPipe(string& sTarget, const char* sentence, string& sFound)	{
+		regex regName(sentence);
+		smatch m;
+		if (regex_search(sTarget, m, regName)) {
+			for (auto& buffer : m)
+				sFound = buffer;
 		}
 
-		void SetCurrentOS(CString &nOSVersion)
-		{
-			cCurrentOS = _T("\"");
-			cCurrentOS += nOSVersion;
-			cCurrentOS += _T("\" ");
-		}
+		if (sFound == "")	return false;
+		else				return true;
+	}
 
-		void exitVM() {
-			map<string, string> ::iterator PrintIter;
-			if (mapOS.empty() == FALSE)	{
-				for (PrintIter = mapOS.begin();
-					PrintIter != mapOS.end();
-					PrintIter++) {
-					wstring printBuffer = wstring(
-						PrintIter->first.begin(), PrintIter->first.end());	{
-						CString transbuffer(PrintIter->first.c_str());
-						SetCurrentOS(transbuffer);
-						Run(VMSTOP);
-						Sleep(500);
+	void SetCurrentOS(CString &nOSVersion)	{
+		cCurrentOS = _T("\"");
+		cCurrentOS += nOSVersion;
+		cCurrentOS += _T("\" ");
+	}
 
-						Run(VMRECOVERYSNAP);
-						Sleep(500);
-					}
-				}
+	void exitVM() {
+		map<string, string> ::iterator PrintIter;
+		if (mapOS.empty() == FALSE)	{
+			for (PrintIter = mapOS.begin();	PrintIter != mapOS.end();	PrintIter++) 
+			{
+				wstring printBuffer = wstring(PrintIter->first.begin(), PrintIter->first.end());	
+				CString transbuffer(PrintIter->first.c_str());
+				SetCurrentOS(transbuffer);
+				Run(VMSTOP);
+				Sleep(100);
+
+				Run(VMRECOVERYSNAP);
+				Sleep(100);
 			}
 		}
-		 
-
+	}
 };
 }
-  
- 
+
 #endif

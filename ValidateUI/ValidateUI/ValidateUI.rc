@@ -91,7 +91,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     COMBOBOX        IDC_COMBO_SELECTOS,7,59,82,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "가상 머신 실행",IDC_BUTTON_VMRUN,7,84,82,42
-    PUSHBUTTON      "가상머신 중지/초기화",IDC_BUTTON_VMRESET,7,188,82,47
+    PUSHBUTTON      "가상머신 중지/초기화 및 보고서 작성",IDC_BUTTON_VMRESET,7,188,82,47,BS_MULTILINE
     LTEXT           "Select OS",IDC_STATIC,7,39,82,14
     PUSHBUTTON      "감염 및 검증 시작",IDC_BUTTON_SENDFILE,7,135,82,44,WS_DISABLED
 END
@@ -300,19 +300,19 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_STRING_DROPSAMPLE   "랜섬 EXE 파일을 드래그앤 드랍해주세요."
-    IDS_STRING_DROPTOOL     "복구 EXE 파일을 드래그앤 드랍해주세요."
-    IDS_STRING_ERROR        "에러가 발생했습니다."
-    IDS_STRING_SND_SAMPLE   "랜섬 파일 송신을 요청했습니다."
-    IDS_STRING_SND_TOOL     "복구 파일 송신을 요청했습니다."
+    IDS_STRING_DROPSAMPLE   "랜섬 파일을 드래그해주세요."
+    IDS_STRING_DROPTOOL     "복구 파일을 드래그해주세요."
+    IDS_STRING_ERROR        "에러 발생"
+    IDS_STRING_SND_SAMPLE   "랜섬 파일 송신을 요청"
+    IDS_STRING_SND_TOOL     "복구 파일 송신을 요청"
     IDS_STRING_BEGIN_FILE   "파일 송신 시작"
     IDS_STRING_END_FILE     "파일 수신 끝"
-    IDS_STRING_RUN_SAMPLE   "랜섬 파일 감염 시작"
-    IDS_STRING_END_SAMPLE   "랜섬 파일 감염 종료"
-    IDS_STRING_LOG_SAMPLE   "감염 해쉬 비교값을 수신했습니다."
-    IDS_STRING_RUN_TOOL     "복구 파일 시작"
+    IDS_STRING_RUN_SAMPLE   "랜섬 파일 실행"
+    IDS_STRING_END_SAMPLE   "랜섬 파일 종료"
+    IDS_STRING_LOG_SAMPLE   "감염 해쉬 비교결과 수신"
+    IDS_STRING_RUN_TOOL     "복구 파일 실행"
     IDS_STRING_END_TOOL     "복구 파일 종료"
-    IDS_STRING_LOG_TOOL     "복구 해쉬 비교값을 수신했습니다."
+    IDS_STRING_LOG_TOOL     "복구 해쉬 비교결과 수신"
     IDS_STRING_STOP         "에이전트가 중단되었습니다."
     IDS_STRING_HEALTH       "헬스 체크"
     IDS_STRING_READY        "랜섬웨어 외부 감염방지를 위해 랜포트, 와이파이모듈을 제거해주십시오."
@@ -321,9 +321,11 @@ END
 STRINGTABLE
 BEGIN
     IDS_STRING_NUMFILE      "샘플  파일의 개수 :"
-    IDS_STRING_INFECTFILE   "감염되지 않은 파일의 개수 :"
+    IDS_STRING_INFECTFILE   "비감염 파일의 개수 :"
     IDS_STRING_RECOVEFILE   "복구된 파일의 개수 :"
     IDS_STRING_AGENTREADY   "에이전트가 준비 되었습니다."
+    IDS_STRING_VM_RUNNING   "가상머신이 작동중입니다."
+    IDS_STRING_FILEPATH     "파일 경로를 확인해 주세요."
 END
 
 #endif    // Korean (Korea) resources

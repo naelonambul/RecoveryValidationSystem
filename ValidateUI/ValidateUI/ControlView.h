@@ -25,12 +25,13 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 protected:
-	CControlDlg m_wndControl;
 
 public:
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	virtual void PostNcDestroy();
+	CControlDlg m_wndControl;
+
 };
 
 

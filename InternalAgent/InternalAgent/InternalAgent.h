@@ -204,6 +204,8 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 	}
 
 	memset(&Cmd, 0, sizeof(Cmd));
+	memset(&Error, 0, sizeof(Error));
+
 	return 0;
 }
 /////////////////////////////////////////////////////////////////////

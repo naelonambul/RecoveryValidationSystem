@@ -45,12 +45,10 @@ BOOL CValidateUIDoc::OnNewDocument()
 	if (!CDocument::OnNewDocument())
 		return FALSE;
 
-	theApp.SetValidateDoc(this);
-	pszSamplePath.LoadStringW(IDS_STRING_DROPSAMPLE);
-	pszToolPath.LoadStringW(IDS_STRING_DROPTOOL);
 	// TODO: add reinitialization code here
 	// (SDI documents will reuse this document)
 
+	theApp.SetValidateDoc(this);
 	return TRUE;
 }
 
