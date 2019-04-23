@@ -53,7 +53,7 @@
 #endif
 #endif
 
-
+#include <afxdtctl.h>
 #define WM_USER_07READY (WM_USER + 100)
 #define WM_USER_08READY (WM_USER + 200)
 #define WM_USER_10READY (WM_USER + 300)

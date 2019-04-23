@@ -193,6 +193,7 @@
     <ClInclude Include="MachineDlg.h" />
     <ClInclude Include="MyAppProtocol.h" />
     <ClInclude Include="MySocket.h" />
+    <ClInclude Include="PictureEx.h" />
     <ClInclude Include="RecoveryFileView.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="Resource.h" />
@@ -213,6 +214,7 @@
     <ClCompile Include="FileDlg.cpp" />
     <ClCompile Include="MachineDlg.cpp" />
     <ClCompile Include="MySocket.cpp" />
+    <ClCompile Include="PictureEx.cpp" />
     <ClCompile Include="RecoveryFileView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="SampleFileView.cpp" />
@@ -233,6 +235,8 @@
     <ResourceCompile Include="ValidateUI.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="res\gif1.bin" />
+    <None Include="res\gif2.bin" />
     <None Include="res\ValidateUI.rc2" />
   </ItemGroup>
   <ItemGroup>
@@ -240,12 +244,16 @@
     <Image Include="..\..\..\..\FILE_COMPLETE.bmp" />
     <Image Include="..\..\..\..\FILE_RECOVERY.bmp" />
     <Image Include="..\..\..\..\FILE_SAMPLE.bmp" />
+    <Image Include="res\ajax-loader.gif" />
     <Image Include="res\FILE_COMPLETE.bmp" />
     <Image Include="res\FILE_RECOVERY.bmp" />
     <Image Include="res\FILE_SAMPLE.bmp" />
     <Image Include="res\OS_WIN07.bmp" />
     <Image Include="res\OS_WIN08.bmp" />
     <Image Include="res\OS_WIN10.bmp" />
+    <Image Include="res\Spinner-1s-200px (1).gif" />
+    <Image Include="res\Spinner-1s-200px .gif" />
+    <Image Include="res\Spinner-1s-200px.gif" />
     <Image Include="res\Toolbar.bmp" />
     <Image Include="res\ValidateUI.ico" />
     <Image Include="res\ValidateUIDoc.ico" />

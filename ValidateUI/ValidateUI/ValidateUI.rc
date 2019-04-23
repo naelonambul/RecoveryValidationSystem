@@ -110,6 +110,7 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_PICMACDIS,"Static",SS_BITMAP,7,7,15,13
     LISTBOX         IDC_LIST_LOG,7,221,202,189,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    CONTROL         "",IDC_MYPICTURE,"Static",SS_BLACKFRAME,43,50,121,109
 END
 
 
@@ -123,7 +124,6 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_CONTROLDLG, DIALOG
     BEGIN
-        MOCKUP, 0, 50, 0, 0, "..\..\..\..\CONTROL_DLG.jpg"
         LEFTMARGIN, 7
         RIGHTMARGIN, 89
         TOPMARGIN, 7
@@ -132,7 +132,6 @@ BEGIN
 
     IDD_FILE_FORM, DIALOG
     BEGIN
-        MOCKUP, 1, 50, 0, 0, "..\..\..\..\FILE_DLG.jpg"
         LEFTMARGIN, 4
         RIGHTMARGIN, 116
         TOPMARGIN, 7
@@ -170,6 +169,14 @@ IDD_MACDIS_FORM AFX_DIALOG_LAYOUT
 BEGIN
     0
 END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// GIF
+//
+
+IDR_GIF1                GIF                     "res\\ajax-loader.gif"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -320,12 +327,12 @@ END
 
 STRINGTABLE
 BEGIN
-    IDS_STRING_NUMFILE      "샘플  파일의 개수 :"
+    IDS_STRING_NUMFILE      "샘플    파일의 개수 :"
     IDS_STRING_INFECTFILE   "비감염 파일의 개수 :"
     IDS_STRING_RECOVEFILE   "복구된 파일의 개수 :"
     IDS_STRING_AGENTREADY   "에이전트가 준비 되었습니다."
     IDS_STRING_VM_RUNNING   "가상머신이 작동중입니다."
-    IDS_STRING_FILEPATH     "파일 경로를 확인해 주세요."
+    IDS_STRING_FILEPATH     "exe 파일이 필요합니다."
 END
 
 #endif    // Korean (Korea) resources

@@ -84,6 +84,8 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.cx = CxLength;
 	cs.cy = CyLength;
 
+	cs.hMenu = NULL;
+
 	return TRUE;
 }
 

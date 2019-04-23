@@ -9,6 +9,7 @@
 
 #define MAX_SCREEN_X 1920
 #define MAX_SCREEN_Y 1080
+#define HIMETRIC_INCH        2540
 // CMachineDlg dialog
 
 IMPLEMENT_DYNAMIC(CMachineDlg, CDialogEx)
@@ -16,7 +17,6 @@ IMPLEMENT_DYNAMIC(CMachineDlg, CDialogEx)
 CMachineDlg::CMachineDlg(CWnd* pParent /*=NULL*/)
 	: CDialogEx(IDD_MACDIS_FORM, pParent)
 {
-
 }
 
 CMachineDlg::~CMachineDlg()
@@ -27,6 +27,7 @@ void CMachineDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST_LOG, m_Log_List);
+	DDX_Control(pDX, IDC_PICMACDIS2, m_Picture);
 }
 
 
@@ -39,12 +40,28 @@ END_MESSAGE_MAP()
 // CMachineDlg message handlers
 
 
+BOOL CMachineDlg::OnInitDialog()
+{
+	CDialogEx::OnInitDialog();
+
+	// TODO:  Add extra initialization here
+
+	if (m_Picture.Load(MAKEINTRESOURCE(IDR_GIF1), _T("GIF")))	// 등록 된 리소스에서 로드하는 방법입니다 ~
+	{
+		m_Picture.Draw();
+	}
+
+	return TRUE;  // return TRUE unless you set the focus to a control
+				  // EXCEPTION: OCX Property Pages should return FALSE
+}
+
+
 void CMachineDlg::PictureChange(int IDB_NUM)
 {
-	CStatic *m_pPicture1 = (CStatic*)GetDlgItem(IDC_PICMACDIS);
+	CStatic *m_pPictureOS = (CStatic*)GetDlgItem(IDC_PICMACDIS);
 
 	new_image.LoadBitmapW(IDB_NUM);
-	HBITMAP h_old_bitmap = m_pPicture1->SetBitmap(new_image);
+	HBITMAP h_old_bitmap = m_pPictureOS->SetBitmap(new_image);
 	if (h_old_bitmap != NULL)
 		::DeleteObject(h_old_bitmap);
 
@@ -97,6 +114,7 @@ void CMachineDlg::OnPaint()
 
 	dc.BitBlt(0, 0, MAX_SCREEN_X, MAX_SCREEN_Y,
 		&memdc, 0, 0, SRCCOPY);
+
 }
 void CMachineDlg::ListGetCount()
 {
@@ -133,4 +151,3 @@ void CMachineDlg::ListInsertString(MYLOG* const tmpLog)
 	m_Log_List.InsertString(m_nCount, CommandString);
 	m_Log_List.SetCurSel(m_nCount);
 }
-

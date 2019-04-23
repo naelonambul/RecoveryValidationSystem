@@ -109,7 +109,7 @@ void CControlDlg::OnBnClickedButtonVmRun()
 		WaitForSingleObject(waitMsg, INFINITE);
 	}
 	Sleep(900);
-	if (Win.nRunMachine >= 3){	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);	}
+	if (nReady >= 3){	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);	}
 	else { GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE); }
 }
 

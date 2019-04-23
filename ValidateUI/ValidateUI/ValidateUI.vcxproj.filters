@@ -75,6 +75,9 @@
     <ClInclude Include="VBox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PictureEx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ValidateUI.cpp">
@@ -125,6 +128,9 @@
     <ClCompile Include="VBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PictureEx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="ValidateUI.rc">
@@ -133,6 +139,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="res\ValidateUI.rc2">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\gif1.bin">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="res\gif2.bin">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
@@ -174,6 +186,18 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\FILE_COMPLETE.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Spinner-1s-200px.gif">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Spinner-1s-200px (1).gif">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Spinner-1s-200px .gif">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\ajax-loader.gif">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

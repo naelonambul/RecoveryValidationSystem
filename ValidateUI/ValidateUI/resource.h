@@ -15,6 +15,7 @@
 #define IDD_MACDIS_FORM                 317
 #define IDB_BITMAP_WIN08                320
 #define IDB_BITMAP_WIN10                321
+#define IDR_GIF1                        321
 #define IDB_BITMAP_WIN07                322
 #define IDC_COMBO_SELECTOS              1001
 #define IDC_BUTTON_VMRUN                1003
@@ -27,6 +28,8 @@
 #define IDC_PICMACDIS                   1011
 #define IDC_LIST1                       1012
 #define IDC_LIST_LOG                    1012
+#define IDC_PICMACDIS2                  1015
+#define IDC_MYPICTURE                   1015
 #define IDS_STRING50000                 50000
 #define IDS_STRING_DROPSAMPLE           50000
 #define IDS_STRING50001                 50001
@@ -57,7 +60,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        310
+#define _APS_NEXT_RESOURCE_VALUE        322
 #define _APS_NEXT_COMMAND_VALUE         32771
 #define _APS_NEXT_CONTROL_VALUE         1000
 #define _APS_NEXT_SYMED_VALUE           310

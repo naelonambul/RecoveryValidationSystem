@@ -1,5 +1,6 @@
 #pragma once
 #include "afxwin.h"
+#include "PictureEx.h"
 
 struct MYLOG;
 // CMachineDlg dialog
@@ -23,6 +24,7 @@ private:
 	int m_nCount;
 	CListBox m_Log_List;
 
+	CPictureEx m_Picture;
 public:
 	CMachineDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CMachineDlg();
@@ -46,4 +48,6 @@ public:
 	void PictureChange(int IDB_NUM);
 	void ListGetCount();
 	void CMachineDlg::ListInsertString(MYLOG* const tmpLog);
+	virtual BOOL OnInitDialog();
+
 };
