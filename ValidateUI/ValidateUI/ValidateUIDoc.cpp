@@ -183,13 +183,13 @@ void CValidateUIDoc::releasePtrList(CPtrList &nParam)
 	}
 }
 
-BOOL CValidateUIDoc::exportCSV()
+BOOL CValidateUIDoc::exportCSV07()
 {
 	_wsetlocale(LC_ALL, L"kor");
 	FILE* fp = nullptr;
-		fopen_s(&fp, "Report.csv", "w+");
+	fopen_s(&fp, "Report07.csv", "w+");
 
-		_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
+	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
 	POSITION pos = Version07.GetHeadPosition();
 	MYLOG* csvBuffer;
 
@@ -215,8 +215,25 @@ BOOL CValidateUIDoc::exportCSV()
 		}
 	}
 	_ftprintf(fp, _T("\n"));
+	fclose(fp);
 
-	pos = Version08.GetHeadPosition();
+	return 0;
+}
+
+
+
+BOOL CValidateUIDoc::exportCSV08()
+{
+	_wsetlocale(LC_ALL, L"kor");
+
+	FILE* fp = nullptr;
+	fopen_s(&fp, "Report08.csv", "w+");
+
+	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
+	POSITION pos = Version08.GetHeadPosition();
+	MYLOG* csvBuffer;
+	CString resultBuffer;
+
 	while (pos != NULL)
 	{
 		csvBuffer = (MYLOG*)Version08.GetNext(pos);
@@ -238,8 +255,23 @@ BOOL CValidateUIDoc::exportCSV()
 		}
 	}
 	_ftprintf(fp, _T("\n"));
-	
-	pos = Version10.GetHeadPosition();
+	fclose(fp);
+
+	return 0;
+}
+
+
+BOOL CValidateUIDoc::exportCSV10()
+{
+
+	FILE* fp = nullptr;
+	fopen_s(&fp, "Report10.csv", "w+");
+
+	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
+	POSITION pos = Version10.GetHeadPosition();
+	MYLOG* csvBuffer;
+	CString resultBuffer;
+
 	while (pos != NULL)
 	{
 		csvBuffer = (MYLOG*)Version10.GetNext(pos);
@@ -261,11 +293,11 @@ BOOL CValidateUIDoc::exportCSV()
 		}
 	}
 	_ftprintf(fp, _T("\n"));
-
 	fclose(fp);
 
 	return 0;
 }
+
 
 void CValidateUIDoc::CmdToCString(const int nCmd)
 {

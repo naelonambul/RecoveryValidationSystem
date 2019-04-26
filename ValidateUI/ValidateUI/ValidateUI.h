@@ -47,8 +47,11 @@ enum g_SCREENSIZE {
 	CxDisplay = CxLength - CxFileDlg - CxControlDlg
 };
 
-enum g_THREADSTATE {
-
+enum g_SPINPOSITION {
+	READY	= 100,
+	SAMPLE	= 200,
+	TOOL	= 300,
+	ALL		= 400
 };
 
 // CValidateUIApp:

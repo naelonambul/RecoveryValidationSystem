@@ -147,6 +147,9 @@
     <None Include="res\gif2.bin">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="res\gif6.bin">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\ValidateUIDoc.ico">
@@ -188,16 +191,22 @@
     <Image Include="res\FILE_COMPLETE.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="res\ajax-loader.gif">
+      <Filter>Resource Files</Filter>
+    </Image>
     <Image Include="res\Spinner-1s-200px.gif">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\Spinner-1s-200px (1).gif">
+    <Image Include="res\Spinner-0.5s-200px.gif">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\Spinner-1s-200px .gif">
+    <Image Include="res\Spinner-0.8s-200px.gif">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="res\ajax-loader.gif">
+    <Image Include="res\Spinner-0.3s-200px.gif">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Spinner-0.5s-103px.gif">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

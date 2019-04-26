@@ -220,7 +220,7 @@ UINT CValidateUIApp::ThreadAccept(LPVOID pParam)
 	((CValidateUIApp*)pParam)->m_sCommand.InitCS();
 	if (((CValidateUIApp*)pParam)->m_sCommand.mySocket())
 		return 1;
-	 
+	
 	return 0;
 }
 
@@ -245,8 +245,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 	{
 		nVersion = sBuffer.nVersion;
 
-		if (sBuffer.nCode != COMMAND_HEALTH && sBuffer.nCode != COMMAND_ERROR)
-		{
+		if (sBuffer.nCode != COMMAND_HEALTH && sBuffer.nCode != COMMAND_ERROR )		{
 			//create log
 			MYLOG* tmpLog = new MYLOG;
 			tmpLog->cNow = CTime::GetCurrentTime();
@@ -254,8 +253,7 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 			tmpLog->nSize = sBuffer.nSize;
 			tmpLog->nVersion = sBuffer.nVersion;
 
-			switch (sBuffer.nVersion)
-			{
+			switch (sBuffer.nVersion){
 			case 7:
 				theApp.m_pDoc->Version07.AddTail(tmpLog);   
 				theApp.m_pDisplayView->m_wndMachine07.ListInsertString(tmpLog);
@@ -264,14 +262,22 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 				case COMMAND_READY:
 					//UI Begin 
 					theApp.m_pDisplayView->m_wndMachine07.m_nFile = sBuffer.nSize;
-					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_07READY, NULL, NULL);
+					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_07READY, NULL, TRUE);
+					theApp.m_pDisplayView->m_wndMachine07.PostMessage(WM_USER_SPINSTOP, NULL, READY);
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine07.m_nInfect = sBuffer.nSize;
 					theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0, hClient);
+					theApp.m_pDisplayView->m_wndMachine07.PostMessage(WM_USER_SPINSTOP, NULL, SAMPLE);
+					theApp.m_pDisplayView->m_wndMachine07.PostMessage(WM_USER_SPINSTART, NULL, TOOL);
 					break;
 				case COMMAND_LOG_TOOL:
 					theApp.m_pDisplayView->m_wndMachine07.m_nRecovery = sBuffer.nSize;
+					theApp.m_pDisplayView->m_wndMachine07.PostMessage(WM_USER_SPINSTOP, NULL, TOOL);
+					theApp.m_sCommand.SendCommandToOne(COMMAND_STOP, 0, hClient);
+					theApp.m_pControlView->m_wndControl.pVboxThread->PostThreadMessage(WM_USER_VMEXITONE, NULL, nVersion);
+					theApp.m_sCommand.DeleteUser(hClient);
+					theApp.m_pDoc->exportCSV07();
 					break;
 				}
 				theApp.m_pDisplayView->m_wndMachine07.InvalidateRect(NULL, 0);
@@ -284,14 +290,22 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 				switch (sBuffer.nCode) {
 				case COMMAND_READY:
 					theApp.m_pDisplayView->m_wndMachine08.m_nFile = sBuffer.nSize;
-					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_08READY, NULL, NULL);
+					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_08READY, NULL, TRUE);
+					theApp.m_pDisplayView->m_wndMachine08.PostMessage(WM_USER_SPINSTOP, NULL, READY);
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine08.m_nInfect = sBuffer.nSize;
-					theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0 , hClient);
+					theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0, hClient);
+					theApp.m_pDisplayView->m_wndMachine08.PostMessage(WM_USER_SPINSTOP, NULL, SAMPLE);
+					theApp.m_pDisplayView->m_wndMachine08.PostMessage(WM_USER_SPINSTART, NULL, TOOL);
 					break;
 				case COMMAND_LOG_TOOL:
 					theApp.m_pDisplayView->m_wndMachine08.m_nRecovery = sBuffer.nSize;
+					theApp.m_pDisplayView->m_wndMachine08.PostMessage(WM_USER_SPINSTOP, NULL, TOOL);
+					theApp.m_sCommand.SendCommandToOne(COMMAND_STOP, 0, hClient);
+					theApp.m_pControlView->m_wndControl.pVboxThread->PostThreadMessage(WM_USER_VMEXITONE, NULL, nVersion);
+					theApp.m_sCommand.DeleteUser(hClient);
+					theApp.m_pDoc->exportCSV08();
 					break;
 				}
 				theApp.m_pDisplayView->m_wndMachine08.InvalidateRect(NULL, 0);
@@ -304,15 +318,23 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 				switch (sBuffer.nCode) {
 				case COMMAND_READY:
 					theApp.m_pDisplayView->m_wndMachine10.m_nFile = sBuffer.nSize;
-					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_10READY, NULL, NULL);
+					theApp.m_pControlView->m_wndControl.PostMessage(WM_USER_10READY, NULL, TRUE);
+					theApp.m_pDisplayView->m_wndMachine10.PostMessage(WM_USER_SPINSTOP, NULL, READY);
 					break;
 				case COMMAND_LOG_SAMPLE:
 					theApp.m_pDisplayView->m_wndMachine10.m_nInfect = sBuffer.nSize;
 					theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0, hClient);
+					theApp.m_pDisplayView->m_wndMachine10.PostMessage(WM_USER_SPINSTOP, NULL, SAMPLE);
+					theApp.m_pDisplayView->m_wndMachine10.PostMessage(WM_USER_SPINSTART, NULL, TOOL);
 					break;
 				case COMMAND_LOG_TOOL:
 					 theApp.m_pDisplayView->m_wndMachine10.m_nRecovery = sBuffer.nSize;
-					break;
+					 theApp.m_pDisplayView->m_wndMachine10.PostMessage(WM_USER_SPINSTOP, NULL, TOOL);
+					 theApp.m_sCommand.SendCommandToOne(COMMAND_STOP, 0, hClient);
+					 theApp.m_pControlView->m_wndControl.pVboxThread->PostThreadMessage(WM_USER_VMEXITONE, NULL, nVersion);
+					 theApp.m_sCommand.DeleteUser(hClient);
+					 theApp.m_pDoc->exportCSV10();
+					 break;
 				}
 				theApp.m_pDisplayView->m_wndMachine10.InvalidateRect(NULL, 0);
 
@@ -325,23 +347,17 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 
 		if (sBuffer.nCode == COMMAND_ERROR)
 		{
-			
+			CString myError;
+			myError.Format(_T("Error : WIN %d"), nVersion);
+			AfxMessageBox(myError);
+			theApp.m_sCommand.DeleteUser(hClient);
+			break;
 		}
 		memset((void*)&sBuffer, 0, sizeof(sBuffer));
 	}
 
-	::EnterCriticalSection(&mySocket->m_cs);	
-
-	POSITION pos = mySocket->m_listClient.Find(hClient);
-	if (pos != NULL)
-		mySocket->m_listClient.RemoveAt(pos);
-
-	::LeaveCriticalSection(&mySocket->m_cs);
-	::closesocket(hClient);
-
-	CString myError;
-	myError.Format(_T("Disconnected : WIN %d"), nVersion);
-	AfxMessageBox(myError);
+	if (mySocket->m_listClient.GetSize() == 0)
+		mySocket->CloseAll();
 
 	return 2;
 }

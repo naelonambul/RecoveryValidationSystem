@@ -24,7 +24,7 @@ private:
 	int m_nCount;
 	CListBox m_Log_List;
 
-	CPictureEx m_Picture;
+
 public:
 	CMachineDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CMachineDlg();
@@ -32,6 +32,10 @@ public:
 	int m_nFile = 0;
 	int m_nInfect = 0;
 	int m_nRecovery = 0;
+
+	CPictureEx m_PictureTop;
+	CPictureEx m_PictureMid;
+	CPictureEx m_PictureBtm;
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_MACDIS_FORM };
@@ -50,4 +54,8 @@ public:
 	void CMachineDlg::ListInsertString(MYLOG* const tmpLog);
 	virtual BOOL OnInitDialog();
 
+
+protected:
+	afx_msg LRESULT OnUserSpinstart(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUserSpinstop(WPARAM wParam, LPARAM lParam);
 };

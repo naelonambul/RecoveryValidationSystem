@@ -39,6 +39,7 @@ int p_END_SAMPLEfuc	(cDataStruct *agentData, SOCKET hSocket);
 int p_RUN_TOOLfuc	(cDataStruct *agentData, SOCKET hSocket);
 int p_END_TOOLfuc	(cDataStruct *agentData, SOCKET hSocket);
 int p_HEALTHfuc		(cDataStruct *agentData, SOCKET hSocket);
+int p_STOPfuc		(cDataStruct *agentData, SOCKET hSocket);
 
 DWORD WINAPI MySampleThread(LPVOID lpParam);
 DWORD WINAPI MyToolThread(LPVOID lpParam); 
@@ -99,6 +100,7 @@ int main()
 	pAgentFuc[COMMAND_RUN_SAMPLE]	= p_RUN_SAMPLEfuc;
 	pAgentFuc[COMMAND_RUN_TOOL]		= p_RUN_TOOLfuc;
 	pAgentFuc[COMMAND_HEALTH]		= p_HEALTHfuc;
+	pAgentFuc[COMMAND_STOP]			= p_STOPfuc;
 
 	//Ready
 	SendCommand(COMMAND_READY, &myData, hSocket);
@@ -120,10 +122,7 @@ int main()
 		
 		memset(&cBuffer, 0, sizeof(cBuffer));
 	}
-	SendCommand(COMMAND_STOP, &myData, hSocket);
-	::closesocket(hSocket);
-	::Sleep(100);	//wait for exit
-	::WSACleanup();
+
     return 0;
 }
 
@@ -321,6 +320,14 @@ int p_END_TOOLfuc(cDataStruct *agentData, SOCKET hSocket)
 	//Send Recovery Log
 	printf("Same File :%d\n", agentData->m_nCountFile);
 	SendCommand(COMMAND_LOG_TOOL, agentData, hSocket);
+	return 1;
+}
+int p_STOPfuc(cDataStruct *agentData, SOCKET hSocket)
+{
+	SendCommand(COMMAND_STOP, agentData, hSocket);
+	::closesocket(hSocket);
+	::Sleep(100);	//wait for exit
+	::WSACleanup();
 	return 1;
 }
 

@@ -68,6 +68,8 @@ public:
 	CString& GetToolPath();
 	void CmdToCString(const int nCmd);
 
-	BOOL exportCSV();
+	BOOL exportCSV07();
 
+	BOOL exportCSV08();
+	BOOL exportCSV10();
 };

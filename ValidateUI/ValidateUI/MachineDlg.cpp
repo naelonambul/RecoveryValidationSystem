@@ -27,13 +27,17 @@ void CMachineDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_LIST_LOG, m_Log_List);
-	DDX_Control(pDX, IDC_PICMACDIS2, m_Picture);
+	DDX_Control(pDX, IDC_MYPICTURETOP, m_PictureTop);
+	DDX_Control(pDX, IDC_MYPICTUREMID, m_PictureMid);
+	DDX_Control(pDX, IDC_MYPICTUREBTM, m_PictureBtm);
 }
 
 
 BEGIN_MESSAGE_MAP(CMachineDlg, CDialogEx)
 	ON_WM_ERASEBKGND()
 	ON_WM_PAINT()
+	ON_MESSAGE(WM_USER_SPINSTART, &CMachineDlg::OnUserSpinstart)
+	ON_MESSAGE(WM_USER_SPINSTOP, &CMachineDlg::OnUserSpinstop)
 END_MESSAGE_MAP()
 
 
@@ -45,11 +49,6 @@ BOOL CMachineDlg::OnInitDialog()
 	CDialogEx::OnInitDialog();
 
 	// TODO:  Add extra initialization here
-
-	if (m_Picture.Load(MAKEINTRESOURCE(IDR_GIF1), _T("GIF")))	// 등록 된 리소스에서 로드하는 방법입니다 ~
-	{
-		m_Picture.Draw();
-	}
 
 	return TRUE;  // return TRUE unless you set the focus to a control
 				  // EXCEPTION: OCX Property Pages should return FALSE
@@ -150,4 +149,51 @@ void CMachineDlg::ListInsertString(MYLOG* const tmpLog)
 	ListGetCount();
 	m_Log_List.InsertString(m_nCount, CommandString);
 	m_Log_List.SetCurSel(m_nCount);
+}
+
+
+afx_msg LRESULT CMachineDlg::OnUserSpinstart(WPARAM wParam, LPARAM lParam)
+{
+	switch((int)lParam)
+	{
+	case READY:
+		m_PictureTop.Load(MAKEINTRESOURCE(IDR_GIF6), _T("GIF"));
+		m_PictureTop.Draw();
+		break;
+	case SAMPLE:
+		m_PictureMid.Load(MAKEINTRESOURCE(IDR_GIF6), _T("GIF"));
+		m_PictureMid.Draw();
+		break;
+	case TOOL:
+		m_PictureBtm.Load(MAKEINTRESOURCE(IDR_GIF6), _T("GIF"));
+		m_PictureBtm.Draw();
+		break;
+	}
+return 0;
+}
+
+
+afx_msg LRESULT CMachineDlg::OnUserSpinstop(WPARAM wParam, LPARAM lParam)
+{
+	switch ((int)lParam)
+	{
+	case READY:
+		m_PictureTop.UnLoad();
+		Sleep(1);
+		break;
+	case SAMPLE:
+		m_PictureMid.UnLoad();
+		Sleep(1);
+		break;
+	case TOOL:
+		m_PictureBtm.UnLoad();
+		Sleep(1);
+		break;
+	case ALL:
+		PostMessage(WM_USER_SPINSTOP, NULL, READY);
+		PostMessage(WM_USER_SPINSTOP, NULL, SAMPLE);
+		PostMessage(WM_USER_SPINSTOP, NULL, TOOL);
+	}
+	InvalidateRect(NULL, 0);
+	return 0;
 }

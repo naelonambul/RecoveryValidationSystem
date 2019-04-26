@@ -91,7 +91,7 @@ FONT 8, "MS Shell Dlg", 0, 0, 0x0
 BEGIN
     COMBOBOX        IDC_COMBO_SELECTOS,7,59,82,49,CBS_DROPDOWNLIST | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "가상 머신 실행",IDC_BUTTON_VMRUN,7,84,82,42
-    PUSHBUTTON      "가상머신 중지/초기화 및 보고서 작성",IDC_BUTTON_VMRESET,7,188,82,47,BS_MULTILINE
+    PUSHBUTTON      "가상머신 중지/초기화",IDC_BUTTON_VMRESET,7,188,82,47,BS_MULTILINE
     LTEXT           "Select OS",IDC_STATIC,7,39,82,14
     PUSHBUTTON      "감염 및 검증 시작",IDC_BUTTON_SENDFILE,7,135,82,44,WS_DISABLED
 END
@@ -110,7 +110,9 @@ FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
     CONTROL         "",IDC_PICMACDIS,"Static",SS_BITMAP,7,7,15,13
     LISTBOX         IDC_LIST_LOG,7,221,202,189,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
-    CONTROL         "",IDC_MYPICTURE,"Static",SS_BLACKFRAME,43,50,121,109
+    CONTROL         "",IDC_MYPICTURETOP,"Static",SS_BLACKFRAME,146,34,63,57
+    CONTROL         "",IDC_MYPICTUREMID,"Static",SS_BLACKFRAME,146,94,63,57
+    CONTROL         "",IDC_MYPICTUREBTM,"Static",SS_BLACKFRAME,146,154,63,57
 END
 
 
@@ -124,6 +126,7 @@ GUIDELINES DESIGNINFO
 BEGIN
     IDD_CONTROLDLG, DIALOG
     BEGIN
+        MOCKUP, 0, 50, 0, 0, "..\..\..\..\CONTROL_DLG.jpg"
         LEFTMARGIN, 7
         RIGHTMARGIN, 89
         TOPMARGIN, 7
@@ -132,6 +135,7 @@ BEGIN
 
     IDD_FILE_FORM, DIALOG
     BEGIN
+        MOCKUP, 1, 50, 0, 0, "..\..\..\..\FILE_DLG.jpg"
         LEFTMARGIN, 4
         RIGHTMARGIN, 116
         TOPMARGIN, 7
@@ -178,6 +182,16 @@ END
 
 IDR_GIF1                GIF                     "res\\ajax-loader.gif"
 
+IDR_GIF2                GIF                     "res\\Spinner-1s-200px.gif"
+
+IDR_GIF3                GIF                     "res\\Spinner-0.5s-200px.gif"
+
+IDR_GIF4                GIF                     "res\\Spinner-0.8s-200px.gif"
+
+IDR_GIF5                GIF                     "res\\Spinner-0.3s-200px.gif"
+
+IDR_GIF6                GIF                     "res\\Spinner-0.5s-103px.gif"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -192,7 +206,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "ValidateUI\n\nValidateUI\n\n\nValidateUI.Document\nValidateUI.Document"
+    IDR_MAINFRAME           "복구도구 검증 프로그램\n\nValidateUI\n\n\nValidateUI.Document\nValidateUI.Document"
 END
 
 STRINGTABLE

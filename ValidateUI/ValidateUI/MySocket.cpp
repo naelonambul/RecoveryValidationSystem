@@ -68,6 +68,7 @@ BOOL CMySocket::mySocket()
 			break;
 		}
 	CWinThread *pAcceptThread = AfxBeginThread(CValidateUIApp::ThreadCommand, this);
+	
 	}
 
 	return TRUE;
@@ -82,6 +83,22 @@ BOOL CMySocket::AddUser(SOCKET hClient)
 
 	return TRUE;
 }
+
+
+BOOL CMySocket::DeleteUser(SOCKET hClient)
+{
+	::EnterCriticalSection(&m_cs);
+
+	POSITION pos = m_listClient.Find(hClient);
+	if (pos != NULL)
+		m_listClient.RemoveAt(pos);
+
+	::LeaveCriticalSection(&m_cs);
+	::closesocket(hClient);
+
+	return 0;
+}
+
 
 BOOL CMySocket::CloseAll()
 {
@@ -210,3 +227,4 @@ BOOL CMySocket::SendFileToAll(CString& cFilePath)
 		}
 	return 0;
 }
+

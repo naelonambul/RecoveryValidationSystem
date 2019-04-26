@@ -79,7 +79,7 @@ BOOL CMainFrame::PreCreateWindow(CREATESTRUCT& cs)
 	cs.style = WS_OVERLAPPED | WS_CAPTION | FWS_ADDTOTITLE
 		 | WS_THICKFRAME | WS_SYSMENU;
 
-	cs.style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX);
+	cs.style &= ~(WS_THICKFRAME | WS_MAXIMIZEBOX | FWS_ADDTOTITLE);
 
 	cs.cx = CxLength;
 	cs.cy = CyLength;

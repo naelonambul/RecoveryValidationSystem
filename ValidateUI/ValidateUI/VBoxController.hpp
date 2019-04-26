@@ -113,12 +113,12 @@ public:
 
 			if (nOrder == VMRECOVERYSNAP)	{
 				if (strcmp((char*)buffer, "100%"))
-				--nRunMachine;
+				if(nRunMachine > 0) --nRunMachine;
 			}
 
 			if (nOrder == VMSTART)	{
 				if(strcmp((char*)buffer, "successfully started"))
-				nRunMachine++;
+				if (nRunMachine < 3) ++nRunMachine;
 			}
 			//parsing vm list
 			if (nOrder == VMLIST)	{  
@@ -146,17 +146,16 @@ public:
 		else				return true;
 	}
 
-	void SetCurrentOS(CString &nOSVersion)	{
+	void SetCurrentOS(CString &cOSVersion)	{
 		cCurrentOS = _T("\"");
-		cCurrentOS += nOSVersion;
+		cCurrentOS += cOSVersion;
 		cCurrentOS += _T("\" ");
 	}
 
 	void exitVM() {
 		map<string, string> ::iterator PrintIter;
 		if (mapOS.empty() == FALSE)	{
-			for (PrintIter = mapOS.begin();	PrintIter != mapOS.end();	PrintIter++) 
-			{
+			for (PrintIter = mapOS.begin();	PrintIter != mapOS.end();	PrintIter++) 	{
 				wstring printBuffer = wstring(PrintIter->first.begin(), PrintIter->first.end());	
 				CString transbuffer(PrintIter->first.c_str());
 				SetCurrentOS(transbuffer);
@@ -165,6 +164,35 @@ public:
 
 				Run(VMRECOVERYSNAP);
 				Sleep(100);
+			}
+		}
+	}
+
+
+
+	void exitOneVm(int nOSversion)
+	{
+		CString cOSVersion;
+
+		switch (nOSversion){
+		case 7: cOSVersion = _T("IE11 - Win7");  break;
+		case 8:	cOSVersion = _T("IE11 - Win81"); break;
+		case 10: cOSVersion = _T("MSEdge - Win10"); break;
+		}
+
+		map<string, string> ::iterator PrintIter;
+		if (mapOS.empty() == FALSE) {
+			for (PrintIter = mapOS.begin(); PrintIter != mapOS.end(); PrintIter++) {
+				wstring printBuffer = wstring(PrintIter->first.begin(), PrintIter->first.end());
+				CString transbuffer(PrintIter->first.c_str());
+				if (cOSVersion == transbuffer) {
+					SetCurrentOS(transbuffer);
+					Run(VMSTOP);
+					Sleep(100);
+
+					Run(VMRECOVERYSNAP);
+					Sleep(100);
+				}
 			}
 		}
 	}

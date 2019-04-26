@@ -23,6 +23,7 @@ public:
 	Controller Win;
 
 	HANDLE waitMsg = NULL;
+
 	CWinThread *pVboxThread = nullptr;
 private:
 	CComboBox m_comboOSList;

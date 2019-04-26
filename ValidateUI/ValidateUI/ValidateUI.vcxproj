@@ -237,6 +237,7 @@
   <ItemGroup>
     <None Include="res\gif1.bin" />
     <None Include="res\gif2.bin" />
+    <None Include="res\gif6.bin" />
     <None Include="res\ValidateUI.rc2" />
   </ItemGroup>
   <ItemGroup>
@@ -251,8 +252,10 @@
     <Image Include="res\OS_WIN07.bmp" />
     <Image Include="res\OS_WIN08.bmp" />
     <Image Include="res\OS_WIN10.bmp" />
-    <Image Include="res\Spinner-1s-200px (1).gif" />
-    <Image Include="res\Spinner-1s-200px .gif" />
+    <Image Include="res\Spinner-0.3s-200px.gif" />
+    <Image Include="res\Spinner-0.5s-103px.gif" />
+    <Image Include="res\Spinner-0.5s-200px.gif" />
+    <Image Include="res\Spinner-0.8s-200px.gif" />
     <Image Include="res\Spinner-1s-200px.gif" />
     <Image Include="res\Toolbar.bmp" />
     <Image Include="res\ValidateUI.ico" />
