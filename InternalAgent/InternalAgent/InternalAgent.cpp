@@ -105,11 +105,11 @@ int main()
 	//Ready
 	SendCommand(COMMAND_READY, &myData, hSocket);
 
-	while (1) {
+	while (hSocket != INVALID_SOCKET) {
 		cBuffer = { 0 };
 		::recv(hSocket, (char*)&cBuffer, sizeof(cBuffer), 0);
 
-		if (cBuffer.nCode == 0 ||
+		if (cBuffer.nCode == COMMAND_HEALTH || cBuffer.nCode == COMMAND_STOP ||
 			cBuffer.nCode - myData.previousCommand == 100)
 			pAgentFuc[cBuffer.nCode]((cDataStruct*)&myData, hSocket);
 		else {

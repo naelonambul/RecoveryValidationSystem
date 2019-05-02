@@ -74,7 +74,6 @@ public:
 	CValidateUIDoc* m_pDoc = nullptr;
 	
 	CMySocket m_sCommand;
-
 	CRITICAL_SECTION m_csCM;
 
 	CEvent m_evtExit;

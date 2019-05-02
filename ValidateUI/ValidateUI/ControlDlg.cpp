@@ -21,9 +21,11 @@ CControlDlg::CControlDlg(CWnd* pParent /*=NULL*/)
 
 CControlDlg::~CControlDlg()
 {
+	pVboxThread->PostThreadMessage(WM_USER_VMEXIT, NULL, NULL);
+	WaitForSingleObject(waitMsg, INFINITE);
+
 	pVboxThread->PostThreadMessage(WM_USER_STOP, NULL, NULL);
 	WaitForSingleObject(waitMsg, 300);
-
 }
 
 void CControlDlg::DoDataExchange(CDataExchange* pDX)
@@ -37,9 +39,7 @@ BEGIN_MESSAGE_MAP(CControlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_VMRUN, &CControlDlg::OnBnClickedButtonVmRun)
 	ON_BN_CLICKED(IDC_BUTTON_VMRESET, &CControlDlg::OnBnClickedButtonVmReset)
 	ON_BN_CLICKED(IDC_BUTTON_SENDFILE, &CControlDlg::OnBnClickedButtonSendfile)
-	ON_MESSAGE(WM_USER_07READY, &CControlDlg::OnUser07ready)
-	ON_MESSAGE(WM_USER_08READY, &CControlDlg::OnUser08ready)
-	ON_MESSAGE(WM_USER_10READY, &CControlDlg::OnUser10ready)
+	ON_MESSAGE(WM_USER_READY, &CControlDlg::OnUserReady)
 END_MESSAGE_MAP()
 
 
@@ -100,7 +100,7 @@ void CControlDlg::OnBnClickedButtonVmRun()
 		GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 
-		Win.SetCurrentOS(myCurSel);
+		VBoxManager.SetCurrentOS(myCurSel);
 
 		pVboxThread->PostThreadMessage(WM_USER_VMSTOP, NULL, NULL);
 		WaitForSingleObject(waitMsg, INFINITE);
@@ -119,7 +119,7 @@ void CControlDlg::OnBnClickedButtonVmRun()
 		}
 	}
 	Sleep(900);
-	if (nReady >= 3){	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);	}
+	if (nReady >= 3) { GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE); }
 	else { GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(TRUE); }
 }
 
@@ -130,7 +130,7 @@ void CControlDlg::OnBnClickedButtonSendfile()
 
 	CString StartString;
 
-	if (theApp.m_pDoc->GetSamplePath() 	!= _T("") ||
+	if (theApp.m_pDoc->GetSamplePath() != _T("") ||
 		theApp.m_pDoc->GetToolPath() != _T("")
 		&& nReady) {
 		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
@@ -144,28 +144,18 @@ void CControlDlg::OnBnClickedButtonSendfile()
 		Sleep(1000);
 		theApp.m_sCommand.SendCommandToAll(COMMAND_RUN_SAMPLE, 0);
 
-		if (n07Ready == 1) {
-			theApp.m_pDisplayView->m_wndMachine07.PostMessage(WM_USER_SPINSTART, NULL, SAMPLE);
-		}		
-		if (n08Ready == 1) {
-			theApp.m_pDisplayView->m_wndMachine08.PostMessage(WM_USER_SPINSTART, NULL, SAMPLE);
-		}		
-		if (n10Ready == 1) {
-			theApp.m_pDisplayView->m_wndMachine10.PostMessage(WM_USER_SPINSTART, NULL, SAMPLE);
-		}
-
 		if (nReady >= 3) {
 			GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 			GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 		}
 	}
-	else if (!Win.nRunning) {
+	else if (!VBoxManager.m_nRunning) {
 		StartString.LoadStringW(IDS_STRING_VM_RUNNING);
 		AfxMessageBox(StartString);
 	}
 	else {
 		StartString.LoadStringW(IDS_STRING_FILEPATH);
-	AfxMessageBox(StartString);
+		AfxMessageBox(StartString);
 	}
 }
 
@@ -177,6 +167,7 @@ void CControlDlg::OnBnClickedButtonVmReset()
 	GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 	theApp.m_sCommand.SendCommandToAll(COMMAND_STOP, 0);
 	Sleep(1000);
+
 
 	pVboxThread->PostThreadMessage(WM_USER_VMEXIT, NULL, NULL);
 	WaitForSingleObject(waitMsg, INFINITE);
@@ -193,9 +184,6 @@ void CControlDlg::OnBnClickedButtonVmReset()
 	theApp.m_pDisplayView->m_wndMachine10.PostMessage(WM_USER_SPINSTOP, NULL, ALL);
 
 	nReady = 0;//reset count
-	n07Ready = 0;
-	n08Ready = 0;
-	n10Ready = 0;
 }
 
 
@@ -204,57 +192,39 @@ void CControlDlg::ResetOSList()
 	m_comboOSList.ResetContent();
 
 	map<string, string> ::iterator PrintIter;
-	if (Win.mapOS.empty() == FALSE)	{
-		for (PrintIter = Win.mapOS.begin();	PrintIter != Win.mapOS.end(); PrintIter++) {
-			wstring printBuffer = wstring(	PrintIter->first.begin(), PrintIter->first.end());
+	if (VBoxManager.m_mapOS.empty() == FALSE) {
+		for (PrintIter = VBoxManager.m_mapOS.begin(); PrintIter != VBoxManager.m_mapOS.end(); PrintIter++) {
+			wstring printBuffer = wstring(PrintIter->first.begin(), PrintIter->first.end());
 			const wchar_t* result = printBuffer.c_str();
 			m_comboOSList.AddString(result);
 		}
 	}
 }
 
-void CControlDlg::AddReady()
+void CControlDlg::readyCount(BOOL bState)
 {
-	if( nReady < 3 && nReady >= 0)
-	++nReady;
+	if (bState) ++nReady;
+	else --nReady;
 }
 
 BOOL CControlDlg::IsReady()
 {
-	return nReady == Win.nRunMachine;
+	return nReady == VBoxManager.m_nRunMachine;
 }
 
 
-afx_msg LRESULT CControlDlg::OnUser07ready(WPARAM wParam, LPARAM lParam)
+afx_msg LRESULT CControlDlg::OnUserReady(WPARAM wParam, LPARAM lParam)
 {
-	n07Ready = (int)lParam;
+	switch ((int)wParam){
+	case 7: n07Ready = (int)lParam; break;
+	case 8: n08Ready = (int)lParam; break;
+	case 10: n10Ready = (int)lParam; break;
+	}
 
-	AddReady();
+	readyCount((int)lParam);
 	if (IsReady()) { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE); }
 	else { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE); }
 
-	return 0;
-}
-
-
-afx_msg LRESULT CControlDlg::OnUser08ready(WPARAM wParam, LPARAM lParam)
-{
-	n08Ready = (int)lParam;
-
-	AddReady();
-	if (IsReady()) { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE); }
-	else { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE); }
-	return 0;
-}
-
-
-afx_msg LRESULT CControlDlg::OnUser10ready(WPARAM wParam, LPARAM lParam)
-{
-	n10Ready = (int)lParam;
-
-	AddReady();
-	if (IsReady()) { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(TRUE); }
-	else { GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE); }
 	return 0;
 }
 
@@ -269,24 +239,25 @@ UINT CControlDlg::ThreadBox(LPVOID pParam)
 		switch (msg.message)
 		{
 		case WM_USER_VMREADY: 
-			pDlg->Win.GetProgramFilesPath();
-			pDlg->Win.Run(VMLIST);
+			pDlg->VBoxManager.GetProgramFilesPath();
+			pDlg->VBoxManager.Run(VMLIST);
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMSTOP: 
-			pDlg->Win.Run(VMSTOP);
+			pDlg->VBoxManager.Run(VMSTOP);
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMSTART: 
-			pDlg->Win.Run(VMSTART);
+			pDlg->VBoxManager.Run(VMSTART);
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMEXIT: 
-			pDlg->Win.exitVM();
+			if(pDlg->VBoxManager.m_nRunMachine != 0)
+				pDlg->VBoxManager.exitAllVm();
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMEXITONE:
-			pDlg->Win.exitOneVm((int)msg.lParam);
+			pDlg->VBoxManager.exitOneVm((int)msg.lParam);
 			break;
 		case WM_USER_STOP:  
 			SetEvent(pDlg->waitMsg);

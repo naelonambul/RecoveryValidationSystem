@@ -6,32 +6,40 @@ class CMySocket : public CObject
 {
 	SOCKET m_hSocket;
 	SOCKET m_cSocket;
-
-public:
-
 public:
 	CMySocket();
-	virtual ~CMySocket() { ::WSACleanup(); };
+	virtual ~CMySocket()		{ 
+		::WSACleanup();
+		::DeleteCriticalSection(&m_cs);
+	};
 	
 	void InitCS();
 
-	void ErrorHandler(const char* pszMessage);
+	void ErrorHandler(const char* pszMessage) const;
 	BOOL mySocket();
 
 	BOOL AddUser(SOCKET hClient);
 	BOOL DeleteUser(SOCKET hClient);
-
 	BOOL CloseAll();
 
-	SOCKET Get_hSocket(); 
-	SOCKET Get_cSocket();
+	SOCKET Get_hSocket() const; 
+	SOCKET Get_cSocket() const;
 
 	BOOL SendCommandToAll(int nCommandCode, int Size);
-	BOOL SendFileToAll(CString& cFilePath);
 	void SendCommandToOne(int nCommandCode, int Size, SOCKET cSocket);
 	
-	CList<SOCKET, SOCKET> m_listClient;
+	BOOL SendFileToAll(CString& cFilePath);
 
 	HANDLE fileEvent;
+
+	BOOL closeFlagOn();
+	BOOL getFlag() const;
+
+protected:
+private:
 	CRITICAL_SECTION m_cs;
+	CList<SOCKET, SOCKET> m_listClient;
+	BOOL closeFlag;
+public:
+
 };

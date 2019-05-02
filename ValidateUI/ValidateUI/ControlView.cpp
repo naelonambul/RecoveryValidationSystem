@@ -80,6 +80,5 @@ void CControlView::OnSize(UINT nType, int cx, int cy)
 void CControlView::PostNcDestroy()
 {
 	// TODO: Add your specialized code here and/or call the base class
-	m_wndControl.Win.exitVM();
 	CView::PostNcDestroy();
 }

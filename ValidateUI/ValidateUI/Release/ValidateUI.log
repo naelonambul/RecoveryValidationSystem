@@ -1,13 +1,2 @@
-﻿  ControlDlg.cpp
-  ControlView.cpp
-  MainFrm.cpp
-  MySocket.cpp
-  VBoxController.cpp
-  ValidateUI.cpp
-  Generating code
-  8 of 1715 functions ( 0.5%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    15 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  ValidateUI.vcxproj -> C:\Users\20082\Source\Repos\naelonambul\InCompleteProject\ValidateUI\Release\ValidateUI.exe
+﻿  ValidateUI.vcxproj -> C:\Users\20082\Source\Repos\naelonambul\InCompleteProject\ValidateUI\Release\ValidateUI.exe
   ValidateUI.vcxproj -> C:\Users\20082\Source\Repos\naelonambul\InCompleteProject\ValidateUI\Release\ValidateUI.pdb (Full PDB)

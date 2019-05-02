@@ -18,7 +18,7 @@ CMySocket::CMySocket()
 
 }
 
-void CMySocket::ErrorHandler(const char* pszMessage)
+void CMySocket::ErrorHandler(const char* pszMessage) const
 {
 	AfxMessageBox(CString(pszMessage));
 	int a = 0;
@@ -115,7 +115,6 @@ BOOL CMySocket::CloseAll()
 	}
 	::LeaveCriticalSection(&m_cs);
 	::Sleep(100);
-	::DeleteCriticalSection(&m_cs);
 	::closesocket(m_hSocket);
 
 	::WSACleanup();
@@ -123,14 +122,14 @@ BOOL CMySocket::CloseAll()
 }
 
 
-SOCKET CMySocket::Get_hSocket() 
+SOCKET CMySocket::Get_hSocket() const
 {
 	if (!m_hSocket) { ErrorHandler("Invalid m_hSocket"); return NULL; }
 
 	return m_hSocket;
 }
 
-SOCKET CMySocket::Get_cSocket()
+SOCKET CMySocket::Get_cSocket() const
 {
 	if (!m_cSocket) { ErrorHandler("Invalid m_cSocket"); return NULL; }
 
@@ -228,3 +227,17 @@ BOOL CMySocket::SendFileToAll(CString& cFilePath)
 	return 0;
 }
 
+
+
+BOOL CMySocket::closeFlagOn()
+{
+	if (closeFlag == FALSE)
+		closeFlag = TRUE;
+	return closeFlag;
+}
+
+
+BOOL CMySocket::getFlag() const
+{
+	return closeFlag;
+}

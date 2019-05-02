@@ -38,6 +38,7 @@ BEGIN_MESSAGE_MAP(CMachineDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_MESSAGE(WM_USER_SPINSTART, &CMachineDlg::OnUserSpinstart)
 	ON_MESSAGE(WM_USER_SPINSTOP, &CMachineDlg::OnUserSpinstop)
+	ON_MESSAGE(WM_USER_LOGPRINT, &CMachineDlg::OnUserLogprint)
 END_MESSAGE_MAP()
 
 
@@ -123,6 +124,7 @@ void CMachineDlg::ListGetCount()
 
 void CMachineDlg::ListInsertString(MYLOG* const tmpLog)
 {
+
 	CString CommandString;
 	switch (tmpLog->nCode) {
 	case COMMAND_HEALTH:		CommandString.LoadString(IDS_STRING_HEALTH); break;
@@ -195,5 +197,39 @@ afx_msg LRESULT CMachineDlg::OnUserSpinstop(WPARAM wParam, LPARAM lParam)
 		PostMessage(WM_USER_SPINSTOP, NULL, TOOL);
 	}
 	InvalidateRect(NULL, 0);
+	return 0;
+}
+
+
+afx_msg LRESULT CMachineDlg::OnUserLogprint(WPARAM wParam, LPARAM lParam)
+{
+	MYLOG* tmpLog = (MYLOG*)lParam;
+
+	CString CommandString;
+	switch (tmpLog->nCode) {
+	case COMMAND_HEALTH:		CommandString.LoadString(IDS_STRING_HEALTH); break;
+	case COMMAND_ERROR: 		CommandString.LoadString(IDS_STRING_ERROR); break;
+	case COMMAND_SND_SAMPLE:	CommandString.LoadString(IDS_STRING_SND_SAMPLE); break;
+	case COMMAND_SND_TOOL:		CommandString.LoadString(IDS_STRING_SND_TOOL); break;
+	case COMMAND_BEGIN_FILE:	CommandString.LoadString(IDS_STRING_BEGIN_FILE); break;
+	case COMMAND_END_FILE:		CommandString.LoadString(IDS_STRING_END_FILE); break;
+	case COMMAND_RUN_SAMPLE:	CommandString.LoadString(IDS_STRING_RUN_SAMPLE); break;
+	case COMMAND_END_SAMPLE:	CommandString.LoadString(IDS_STRING_END_SAMPLE); break;
+	case COMMAND_LOG_SAMPLE:	CommandString.LoadString(IDS_STRING_LOG_SAMPLE); break;
+	case COMMAND_RUN_TOOL:		CommandString.LoadString(IDS_STRING_RUN_TOOL); break;
+	case COMMAND_END_TOOL:		CommandString.LoadString(IDS_STRING_END_TOOL); break;
+	case COMMAND_LOG_TOOL:		CommandString.LoadString(IDS_STRING_LOG_TOOL); break;
+	case COMMAND_STOP:			CommandString.LoadString(IDS_STRING_STOP); break;
+	case COMMAND_READY:			CommandString.LoadString(IDS_STRING_AGENTREADY); break;
+	}
+
+	CTime timeBuffer = tmpLog->cNow;
+	CString strDataTime;
+	strDataTime = timeBuffer.Format(_T("%Y³â%m¿ù%dÀÏ - %I:%M:%S "));
+	CommandString.Insert(0, strDataTime);
+
+	ListGetCount();
+	m_Log_List.InsertString(m_nCount, CommandString);
+	m_Log_List.SetCurSel(m_nCount);
 	return 0;
 }

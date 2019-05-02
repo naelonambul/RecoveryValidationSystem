@@ -28,8 +28,6 @@ END_MESSAGE_MAP()
 // CValidateUIDoc construction/destruction
 
 CValidateUIDoc::CValidateUIDoc()
-	: pszSamplePath(_T(""))
-	, pszToolPath(_T(""))
 {
 	// TODO: add one-time construction code here
 
@@ -168,9 +166,9 @@ CString& CValidateUIDoc::GetToolPath()
 
 void CValidateUIDoc::clearPtrList()
 {
-	releasePtrList(Version07);
-	releasePtrList(Version08);
-	releasePtrList(Version10);
+	releasePtrList(m_Version07);
+	releasePtrList(m_Version08);
+	releasePtrList(m_Version10);
 }
 
 void CValidateUIDoc::releasePtrList(CPtrList &nParam)
@@ -181,121 +179,6 @@ void CValidateUIDoc::releasePtrList(CPtrList &nParam)
 		delete pData;
 		pData = nullptr;
 	}
-}
-
-BOOL CValidateUIDoc::exportCSV07()
-{
-	_wsetlocale(LC_ALL, L"kor");
-	FILE* fp = nullptr;
-	fopen_s(&fp, "Report07.csv", "w+");
-
-	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
-	POSITION pos = Version07.GetHeadPosition();
-	MYLOG* csvBuffer;
-
-	CString resultBuffer;
-	while (pos != NULL)
-	{
-		csvBuffer = (MYLOG*)Version07.GetNext(pos);
-		if (csvBuffer != NULL) {
-
-			_ftprintf(fp, _T("%d-%d-%d %d:%d:%d,"), 
-				csvBuffer->cNow.GetYear(),
-				csvBuffer->cNow.GetMonth(),
-				csvBuffer->cNow.GetDay(),
-				csvBuffer->cNow.GetHour(), 
-				csvBuffer->cNow.GetMinute(),
-				csvBuffer->cNow.GetSecond());
-			resultBuffer.Format(_T("%d,"), csvBuffer->nVersion);
-			CmdToCString(csvBuffer->nCode);
-			resultBuffer += transBuffer;
-			resultBuffer.AppendFormat(_T(", %d\n"), csvBuffer->nSize);
-
-			_ftprintf(fp, _T("%s"), resultBuffer.GetString());
-		}
-	}
-	_ftprintf(fp, _T("\n"));
-	fclose(fp);
-
-	return 0;
-}
-
-
-
-BOOL CValidateUIDoc::exportCSV08()
-{
-	_wsetlocale(LC_ALL, L"kor");
-
-	FILE* fp = nullptr;
-	fopen_s(&fp, "Report08.csv", "w+");
-
-	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
-	POSITION pos = Version08.GetHeadPosition();
-	MYLOG* csvBuffer;
-	CString resultBuffer;
-
-	while (pos != NULL)
-	{
-		csvBuffer = (MYLOG*)Version08.GetNext(pos);
-		if (csvBuffer != NULL) {
-
-			_ftprintf(fp, _T("%d-%d-%d %d:%d:%d,"),
-				csvBuffer->cNow.GetYear(),
-				csvBuffer->cNow.GetMonth(),
-				csvBuffer->cNow.GetDay(),
-				csvBuffer->cNow.GetHour(),
-				csvBuffer->cNow.GetMinute(),
-				csvBuffer->cNow.GetSecond());
-			resultBuffer.Format(_T("%d,"), csvBuffer->nVersion);
-			CmdToCString(csvBuffer->nCode);
-			resultBuffer += transBuffer;
-			resultBuffer.AppendFormat(_T(", %d\n"), csvBuffer->nSize);
-
-			_ftprintf(fp, _T("%s"), resultBuffer.GetString());
-		}
-	}
-	_ftprintf(fp, _T("\n"));
-	fclose(fp);
-
-	return 0;
-}
-
-
-BOOL CValidateUIDoc::exportCSV10()
-{
-
-	FILE* fp = nullptr;
-	fopen_s(&fp, "Report10.csv", "w+");
-
-	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
-	POSITION pos = Version10.GetHeadPosition();
-	MYLOG* csvBuffer;
-	CString resultBuffer;
-
-	while (pos != NULL)
-	{
-		csvBuffer = (MYLOG*)Version10.GetNext(pos);
-		if (csvBuffer != NULL) {
-
-			_ftprintf(fp, _T("%d-%d-%d %d:%d:%d,"),
-				csvBuffer->cNow.GetYear(),
-				csvBuffer->cNow.GetMonth(),
-				csvBuffer->cNow.GetDay(),
-				csvBuffer->cNow.GetHour(),
-				csvBuffer->cNow.GetMinute(),
-				csvBuffer->cNow.GetSecond());
-			resultBuffer.Format(_T("%d,"), csvBuffer->nVersion);
-			CmdToCString(csvBuffer->nCode);
-			resultBuffer += transBuffer;
-			resultBuffer.AppendFormat(_T(", %d\n"), csvBuffer->nSize);
-
-			_ftprintf(fp, _T("%s"), resultBuffer.GetString());
-		}
-	}
-	_ftprintf(fp, _T("\n"));
-	fclose(fp);
-
-	return 0;
 }
 
 
@@ -319,3 +202,62 @@ void CValidateUIDoc::CmdToCString(const int nCmd)
 	}
 }
 
+int CValidateUIDoc::exportCsvVersion(int nOsVersion)
+{
+	_wsetlocale(LC_ALL, L"kor");
+	FILE* fp = nullptr;
+	CPtrList* pPtrList = nullptr;
+	switch (nOsVersion) {
+	case 7:
+		fopen_s(&fp, "Report07.csv", "w+");
+		pPtrList = &m_Version07;
+		break;
+	case 8:
+		fopen_s(&fp, "Report08.csv", "w+");
+		pPtrList = &m_Version08;
+		break;
+	case 10:
+		fopen_s(&fp, "Report10.csv", "w+");
+		pPtrList = &m_Version10;
+		break;
+	}
+
+	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
+
+	POSITION pos = pPtrList->GetHeadPosition();
+	MYLOG* csvBuffer;
+	CString resultBuffer;
+
+	while (pos != NULL)
+	{
+		csvBuffer = (MYLOG*)pPtrList->GetNext(pos);
+		if (csvBuffer != NULL) {
+
+			_ftprintf(fp, _T("%d-%d-%d %d:%d:%d,"),
+				csvBuffer->cNow.GetYear(),
+				csvBuffer->cNow.GetMonth(),
+				csvBuffer->cNow.GetDay(),
+				csvBuffer->cNow.GetHour(),
+				csvBuffer->cNow.GetMinute(),
+				csvBuffer->cNow.GetSecond());
+			resultBuffer.Format(_T("%d,"), csvBuffer->nVersion);
+			CmdToCString(csvBuffer->nCode);
+			resultBuffer += transBuffer;
+
+			if (csvBuffer->nCode == COMMAND_READY ||
+				csvBuffer->nCode == COMMAND_LOG_SAMPLE ||
+				csvBuffer->nCode == COMMAND_LOG_TOOL) {
+				resultBuffer.AppendFormat(_T(", %d\n"), csvBuffer->nSize);
+			}
+			else {
+				resultBuffer += _T("\n");
+			}
+
+			_ftprintf(fp, _T("%s"), resultBuffer.GetString());
+		}
+	}
+	_ftprintf(fp, _T("\n"));
+	fclose(fp);
+
+	return nOsVersion;
+}

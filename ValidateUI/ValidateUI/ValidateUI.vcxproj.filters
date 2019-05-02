@@ -63,19 +63,19 @@
     <ClInclude Include="MyAppProtocol.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VBoxController.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="utility.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="MySocket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VBox.hpp">
+    <ClInclude Include="PictureEx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PictureEx.h">
+    <ClInclude Include="VBoxController.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VBox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

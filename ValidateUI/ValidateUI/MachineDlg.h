@@ -24,7 +24,6 @@ private:
 	int m_nCount;
 	CListBox m_Log_List;
 
-
 public:
 	CMachineDlg(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CMachineDlg();
@@ -58,4 +57,5 @@ public:
 protected:
 	afx_msg LRESULT OnUserSpinstart(WPARAM wParam, LPARAM lParam);
 	afx_msg LRESULT OnUserSpinstop(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUserLogprint(WPARAM wParam, LPARAM lParam);
 };

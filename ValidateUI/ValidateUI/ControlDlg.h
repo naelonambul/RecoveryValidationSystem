@@ -20,7 +20,7 @@ public:
 
 	int nMachineNumber = 0;
 
-	Controller Win;
+	Controller VBoxManager;
 
 	HANDLE waitMsg = NULL;
 
@@ -41,9 +41,7 @@ public:
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
-	afx_msg LRESULT OnUser07ready(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnUser08ready(WPARAM wParam, LPARAM lParam);
-	afx_msg LRESULT OnUser10ready(WPARAM wParam, LPARAM lParam);
+	afx_msg LRESULT OnUserReady(WPARAM wParam, LPARAM lParam);
 
 	DECLARE_MESSAGE_MAP()
 public:
@@ -52,7 +50,7 @@ public:
 	afx_msg void OnBnClickedButtonVmRun();
 	afx_msg void OnBnClickedButtonVmReset();
 	afx_msg void OnBnClickedButtonSendfile();
-	void AddReady();
+	void readyCount(BOOL bState);
 	BOOL IsReady();
 
 	static UINT ThreadBox(LPVOID pParam);

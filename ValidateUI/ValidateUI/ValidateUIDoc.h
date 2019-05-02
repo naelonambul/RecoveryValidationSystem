@@ -17,9 +17,9 @@ protected: // create from serialization only
 
 // Attributes
 public:
-	CPtrList Version07;
-	CPtrList Version08;
-	CPtrList Version10;
+	CPtrList m_Version07;
+	CPtrList m_Version08;
+	CPtrList m_Version10;
 
 protected:
 	CString pszSamplePath = _T("");
@@ -58,18 +58,16 @@ protected:
 #endif // SHARED_HANDLERS
 	
 public:
-	void releasePtrList(CPtrList &nParam);
-	void clearPtrList();
-
 	void SetSamplePath(CString &cPath);
 	void SetToolPath(CString  &cPath);
 
 	CString& GetSamplePath();
 	CString& GetToolPath();
+
+	int exportCsvVersion(int nOsVersion);
+protected:
+private:
 	void CmdToCString(const int nCmd);
-
-	BOOL exportCSV07();
-
-	BOOL exportCSV08();
-	BOOL exportCSV10();
+	void releasePtrList(CPtrList &nParam);
+	void clearPtrList();
 };
