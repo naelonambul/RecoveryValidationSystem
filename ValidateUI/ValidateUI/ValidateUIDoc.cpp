@@ -141,25 +141,25 @@ void CValidateUIDoc::Dump(CDumpContext& dc) const
 
 void CValidateUIDoc::SetSamplePath(CString &cPath)
 {
-	pszSamplePath = cPath;
+	m_pszSamplePath = cPath;
 }
 
 
 void CValidateUIDoc::SetToolPath(CString  &cPath)
 {
-	pszToolPath = cPath;
+	m_pszToolPath = cPath;
 }
 
 
 CString& CValidateUIDoc::GetSamplePath()
 {
-	return pszSamplePath;
+	return m_pszSamplePath;
 }
 
 
 CString& CValidateUIDoc::GetToolPath()
 {
-	return pszToolPath;
+	return m_pszToolPath;
 }
 
 
@@ -185,20 +185,20 @@ void CValidateUIDoc::releasePtrList(CPtrList &nParam)
 void CValidateUIDoc::CmdToCString(const int nCmd)
 {
 	switch (nCmd) {
-	case COMMAND_HEALTH:		transBuffer.LoadString(IDS_STRING_HEALTH); break;
-	case COMMAND_ERROR: 		transBuffer.LoadString(IDS_STRING_ERROR); break;
-	case COMMAND_SND_SAMPLE:	transBuffer.LoadString(IDS_STRING_SND_SAMPLE); break;
-	case COMMAND_SND_TOOL:		transBuffer.LoadString(IDS_STRING_SND_TOOL); break;
-	case COMMAND_BEGIN_FILE:	transBuffer.LoadString(IDS_STRING_BEGIN_FILE); break;
-	case COMMAND_END_FILE:		transBuffer.LoadString(IDS_STRING_END_FILE); break;
-	case COMMAND_RUN_SAMPLE:	transBuffer.LoadString(IDS_STRING_RUN_SAMPLE); break;
-	case COMMAND_END_SAMPLE:	transBuffer.LoadString(IDS_STRING_END_SAMPLE); break;
-	case COMMAND_LOG_SAMPLE:	transBuffer.LoadString(IDS_STRING_LOG_SAMPLE); break;
-	case COMMAND_RUN_TOOL:		transBuffer.LoadString(IDS_STRING_RUN_TOOL); break;
-	case COMMAND_END_TOOL:		transBuffer.LoadString(IDS_STRING_END_TOOL); break;
-	case COMMAND_LOG_TOOL:		transBuffer.LoadString(IDS_STRING_LOG_TOOL); break;
-	case COMMAND_STOP:			transBuffer.LoadString(IDS_STRING_STOP); break;
-	case COMMAND_READY:			transBuffer.LoadString(IDS_STRING_AGENTREADY); break;
+	case COMMAND_HEALTH:		m_transBuffer.LoadString(IDS_STRING_HEALTH); break;
+	case COMMAND_ERROR: 		m_transBuffer.LoadString(IDS_STRING_ERROR); break;
+	case COMMAND_SND_SAMPLE:	m_transBuffer.LoadString(IDS_STRING_SND_SAMPLE); break;
+	case COMMAND_SND_TOOL:		m_transBuffer.LoadString(IDS_STRING_SND_TOOL); break;
+	case COMMAND_BEGIN_FILE:	m_transBuffer.LoadString(IDS_STRING_BEGIN_FILE); break;
+	case COMMAND_END_FILE:		m_transBuffer.LoadString(IDS_STRING_END_FILE); break;
+	case COMMAND_RUN_SAMPLE:	m_transBuffer.LoadString(IDS_STRING_RUN_SAMPLE); break;
+	case COMMAND_END_SAMPLE:	m_transBuffer.LoadString(IDS_STRING_END_SAMPLE); break;
+	case COMMAND_LOG_SAMPLE:	m_transBuffer.LoadString(IDS_STRING_LOG_SAMPLE); break;
+	case COMMAND_RUN_TOOL:		m_transBuffer.LoadString(IDS_STRING_RUN_TOOL); break;
+	case COMMAND_END_TOOL:		m_transBuffer.LoadString(IDS_STRING_END_TOOL); break;
+	case COMMAND_LOG_TOOL:		m_transBuffer.LoadString(IDS_STRING_LOG_TOOL); break;
+	case COMMAND_STOP:			m_transBuffer.LoadString(IDS_STRING_STOP); break;
+	case COMMAND_READY:			m_transBuffer.LoadString(IDS_STRING_AGENTREADY); break;
 	}
 }
 
@@ -222,11 +222,15 @@ int CValidateUIDoc::exportCsvVersion(int nOsVersion)
 		break;
 	}
 
-	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 해쉬가 같은 파일의 개수\n"));
+	_ftprintf(fp, _T("시간, 윈도우 버전, 명령어, 비교후 같은 해시의 개수\n"));
 
 	POSITION pos = pPtrList->GetHeadPosition();
 	MYLOG* csvBuffer;
-	CString resultBuffer;
+	CString logBuffer;
+	
+	int nFileCount = 0;
+	int nInfestFile = 0;
+	int nRecoveryFile = 0;
 
 	while (pos != NULL)
 	{
@@ -240,20 +244,31 @@ int CValidateUIDoc::exportCsvVersion(int nOsVersion)
 				csvBuffer->cNow.GetHour(),
 				csvBuffer->cNow.GetMinute(),
 				csvBuffer->cNow.GetSecond());
-			resultBuffer.Format(_T("%d,"), csvBuffer->nVersion);
+			logBuffer.Format(_T("%d,"), csvBuffer->nVersion);
 			CmdToCString(csvBuffer->nCode);
-			resultBuffer += transBuffer;
+			logBuffer += m_transBuffer;
 
 			if (csvBuffer->nCode == COMMAND_READY ||
 				csvBuffer->nCode == COMMAND_LOG_SAMPLE ||
 				csvBuffer->nCode == COMMAND_LOG_TOOL) {
-				resultBuffer.AppendFormat(_T(", %d\n"), csvBuffer->nSize);
+				logBuffer.AppendFormat(_T(", %d\n"), csvBuffer->nSize);
 			}
 			else {
-				resultBuffer += _T("\n");
+				logBuffer += _T("\n");
 			}
 
-			_ftprintf(fp, _T("%s"), resultBuffer.GetString());
+			if (csvBuffer->nCode == COMMAND_READY)		{ nFileCount = csvBuffer->nSize; }
+			if (csvBuffer->nCode == COMMAND_LOG_SAMPLE)	{ nInfestFile = csvBuffer->nSize; }
+			if (csvBuffer->nCode == COMMAND_LOG_TOOL)	{ nRecoveryFile = csvBuffer->nSize;	}
+			if (csvBuffer->nCode == COMMAND_STOP)		{
+				_ftprintf(fp, _T("%s"), logBuffer.GetString());
+				CString resultBuffer;
+				resultBuffer.Format(_T("%02d%%"), (nFileCount - nInfestFile) / nRecoveryFile * 100);
+				_ftprintf(fp, _T(",, 복구된 파일의 비율,"));
+				_ftprintf(fp, _T("%s\n"), resultBuffer.GetString());
+			}
+			else { _ftprintf(fp, _T("%s"), logBuffer.GetString()); }
+		
 		}
 	}
 	_ftprintf(fp, _T("\n"));

@@ -15,11 +15,11 @@ using ::MyData::cDataStruct;
 
 using ::MyData::makehash;
 using ::MyData::myFileRun;
-using ::MyData::printList;
-using ::MyData::WatchDirectory;
-using ::MyData::CompareMap;
+using ::MyData::printFileList;
+using ::MyData::watchDirectory;
+using ::MyData::compareMap;
 using ::MyData::SendCommand;
-using ::MyData::Version_OS;
+using ::MyData::versionOS;
 using ::MyData::SendError;
 
 typedef int(*COMD_FUNC)(cDataStruct*, SOCKET);
@@ -46,7 +46,7 @@ DWORD WINAPI MyToolThread(LPVOID lpParam);
 
 int main()
 {
-	int nOSVersion = Version_OS();
+	int nOSVersion = versionOS();
 	printf("OSVersion : %d \n", nOSVersion);
 
 	cDataStruct myData;
@@ -56,8 +56,8 @@ int main()
 	myData.createEvent();
 
 	//Save Hash
-	myData.m_nCountFile = printList(myData.Sample_Before());
-	myData.DisPlayMap(myData.Sample_Before());
+	myData.m_nCountFile = printFileList(myData.Get_Sample_Before());
+	myData.DisplayMap(myData.Get_Sample_Before());
 	puts("");
 
 	WSADATA wsa = { 0 };
@@ -110,7 +110,7 @@ int main()
 		::recv(hSocket, (char*)&cBuffer, sizeof(cBuffer), 0);
 
 		if (cBuffer.nCode == COMMAND_HEALTH || cBuffer.nCode == COMMAND_STOP ||
-			cBuffer.nCode - myData.previousCommand == 100)
+			cBuffer.nCode - myData.m_previousCommand == 100)
 			pAgentFuc[cBuffer.nCode]((cDataStruct*)&myData, hSocket);
 		else {
 			SendError(_T("명령 순서가 맞지 않습니다."), &myData, hSocket);
@@ -138,7 +138,7 @@ int p_SND_SAMPLEfuc(cDataStruct *agentData, SOCKET hSocket)
 	puts("_SND_SAMPLE");
 	//Send Command
 	SendCommand(COMMAND_SND_SAMPLE, agentData, hSocket);
-	agentData->previousCommand = COMMAND_SND_SAMPLE;
+	agentData->m_previousCommand = COMMAND_SND_SAMPLE;
 	//Receive File info
 	FILEINFO sampleData = { 0 };
 	if (::recv(hSocket, (char*)&sampleData, sizeof(sampleData), 0) < sizeof(sampleData))
@@ -159,7 +159,7 @@ int p_SND_TOOLfuc(cDataStruct *agentData, SOCKET hSocket)
 	puts("_SND_TOOL");
 	//Send Command
 	SendCommand(COMMAND_SND_TOOL, agentData, hSocket);
-	agentData->previousCommand = COMMAND_SND_TOOL;
+	agentData->m_previousCommand = COMMAND_SND_TOOL;
 	//Receive File info
 	FILEINFO toolData = { 0 };
 	if (::recv(hSocket, (char*)&toolData, sizeof(toolData), 0) <sizeof(toolData))
@@ -230,7 +230,7 @@ int p_RUN_SAMPLEfuc(cDataStruct *agentData, SOCKET hSocket)
 	puts("_RUN_SAMPLE");
 	//Send Command
 	SendCommand(COMMAND_RUN_SAMPLE, agentData, hSocket);
-	agentData->previousCommand = COMMAND_RUN_SAMPLE;
+	agentData->m_previousCommand = COMMAND_RUN_SAMPLE;
 
 	// Sample Run
 	HANDLE hSamplethread = ::CreateThread(
@@ -244,8 +244,8 @@ int p_RUN_SAMPLEfuc(cDataStruct *agentData, SOCKET hSocket)
 	if(hSamplethread == NULL)			
 		SendError(_T("샘플을 실행하지 못했습니다."), agentData, hSocket);
 	else {
-		::SetEvent(agentData->SampleEvent);
-		printf("Detect File Change: %d\n",WatchDirectory());
+		::SetEvent(agentData->m_SampleEvent);
+		printf("Detect File Change: %d\n",watchDirectory());
 	}
 	//p_END_SAMPLE call
 	p_END_SAMPLEfuc(agentData, hSocket);
@@ -259,13 +259,13 @@ int p_END_SAMPLEfuc(cDataStruct *agentData, SOCKET hSocket)
 	SendCommand(COMMAND_END_SAMPLE, agentData,hSocket);
 
 	//Print Map elements
-	printList(agentData->Sample_After());
+	printFileList(agentData->Get_Sample_After());
 	puts("");
 	//Print
-	agentData->DisPlayMap(agentData->Sample_After());
+	agentData->DisplayMap(agentData->Get_Sample_After());
 	puts("");
 	//Compare Hash
-	agentData->m_nCountFile = agentData->m_nCountFile - CompareMap(agentData->Sample_After(), agentData->Sample_Before());
+	agentData->m_nCountFile = agentData->m_nCountFile - compareMap(agentData->Get_Sample_After(), agentData->Get_Sample_Before());
 	//Send Log
 	printf("Different File :%d\n", agentData->m_nCountFile);
 	SendCommand(COMMAND_LOG_SAMPLE, agentData, hSocket);
@@ -277,7 +277,7 @@ int p_RUN_TOOLfuc(cDataStruct *agentData, SOCKET hSocket)
 	puts("_RUN_TOOL");
 	//SendCommand
 	SendCommand(COMMAND_RUN_TOOL, agentData, hSocket);
-	agentData->previousCommand = COMMAND_RUN_TOOL;
+	agentData->m_previousCommand = COMMAND_RUN_TOOL;
 
 	int m_nCountRecovery = 0;
 	// Tool Run
@@ -292,8 +292,8 @@ int p_RUN_TOOLfuc(cDataStruct *agentData, SOCKET hSocket)
 	if (hToolthread == NULL) 
 		SendError(_T("복구도구를 실행하지 못했습니다."), agentData, hSocket);
 	else {
-		::SetEvent(agentData->ToolEvent);
-		printf("Detect File Change: %d\n", WatchDirectory()); 
+		::SetEvent(agentData->m_ToolEvent);
+		printf("Detect File Change: %d\n", watchDirectory()); 
 	}
 	//END_TOOLfuc call
 	p_END_TOOLfuc(agentData, hSocket);
@@ -307,15 +307,15 @@ int p_END_TOOLfuc(cDataStruct *agentData, SOCKET hSocket)
 	SendCommand(COMMAND_END_TOOL, agentData, hSocket);
 
 	//Save Hash
-	printList(agentData->Tool_After());
+	printFileList(agentData->Get_Tool_After());
 	puts("");
 
 	//Print Map elements
-	agentData->DisPlayMap(agentData->Tool_After());
+	agentData->DisplayMap(agentData->Get_Tool_After());
 	puts("");
 
 	//Compare Hash
-	agentData->m_nCountFile = CompareMap(agentData->Tool_After(), agentData->Sample_Before());
+	agentData->m_nCountFile = compareMap(agentData->Get_Tool_After(), agentData->Get_Sample_Before());
 
 	//Send Recovery Log
 	printf("Same File :%d\n", agentData->m_nCountFile);
@@ -344,7 +344,7 @@ DWORD WINAPI MySampleThread(LPVOID lpParam)
 {
 	cDataStruct *cSampleData = (cDataStruct*)lpParam;
 	
-	::WaitForSingleObject(cSampleData->SampleEvent, INFINITE);
+	::WaitForSingleObject(cSampleData->m_SampleEvent, INFINITE);
 	printf("MySampleThread\n");
 	myFileRun(cSampleData->GetSampleFileInfo()->szFileName);
 
@@ -355,7 +355,7 @@ DWORD WINAPI MyToolThread(LPVOID lpParam)
 {
 	cDataStruct* cToolData = (cDataStruct*)lpParam;
 
-	::WaitForSingleObject(cToolData->ToolEvent, INFINITE);
+	::WaitForSingleObject(cToolData->m_ToolEvent, INFINITE);
 	printf("MyToolThread\n");
 	myFileRun(cToolData->GetToolFileInfo()->szFileName);
 

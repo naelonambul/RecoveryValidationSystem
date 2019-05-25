@@ -41,7 +41,6 @@ public:
 	CString m_MyProgramFilesPath;
 	CString m_MyCommand;
 
-	CPtrList m_outputCommand;
 	CString m_FileOutPut;
 
 	CString m_CurrentOS;

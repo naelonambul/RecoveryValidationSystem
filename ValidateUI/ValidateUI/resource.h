@@ -29,6 +29,7 @@
 #define IDC_BUTTON_RECOVERY             1006
 #define IDC_BUTTON_EXPORT               1007
 #define IDC_BUTTON_SENDFILE             1008
+#define IDC_BUTTON_STARTAGENT           1008
 #define IDC_PICVIEW                     1010
 #define IDC_PICMACDIS                   1011
 #define IDC_LIST1                       1012

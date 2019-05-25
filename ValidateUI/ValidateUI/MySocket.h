@@ -20,7 +20,7 @@ public:
 
 	BOOL AddUser(SOCKET hClient);
 	BOOL DeleteUser(SOCKET hClient);
-	BOOL CloseAll();
+	BOOL CloseAll();					//also thread close
 
 	SOCKET Get_hSocket() const; 
 	SOCKET Get_cSocket() const;
@@ -29,9 +29,7 @@ public:
 	void SendCommandToOne(int nCommandCode, int Size, SOCKET cSocket);
 	
 	BOOL SendFileToAll(CString& cFilePath);
-
-	HANDLE fileEvent;
-
+	
 	BOOL closeFlagOn();
 	BOOL getFlag() const;
 
@@ -39,7 +37,5 @@ protected:
 private:
 	CRITICAL_SECTION m_cs;
 	CList<SOCKET, SOCKET> m_listClient;
-	BOOL closeFlag;
-public:
-
+	BOOL m_bCloseFlag;
 };

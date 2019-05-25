@@ -12,11 +12,11 @@ public:
 	CMachineDlg m_wndMachine08;
 	CMachineDlg m_wndMachine10;
 
-	CDC memdc;
-	CDC*mypDc = nullptr;
+	CDC m_memdc;
+	CDC*m_mypDC = nullptr;
 
-	CBitmap *pOldBitmap = nullptr;
-	CBitmap bitmap;
+	CBitmap *m_pOldBitmap = nullptr;
+	CBitmap m_bitmap;
 protected:
 	CDisplayView();           // protected constructor used by dynamic creation
 	virtual ~CDisplayView();

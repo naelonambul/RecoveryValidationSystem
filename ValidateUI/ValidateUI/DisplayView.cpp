@@ -122,21 +122,21 @@ void CDisplayView::OnPaint()
 					   // TODO: Add your message handler code here
 					   // Do not call CView::OnPaint() for painting messages
 
-	CDC *mypDC = &dc;
-	if (pOldBitmap == nullptr)
+	CDC *m_mypDC = &dc;
+	if (m_pOldBitmap == nullptr)
 	{
-		bitmap.CreateCompatibleBitmap(mypDC, MAX_SCREEN_X, MAX_SCREEN_Y);		//Make bitmap at same size.
-		memdc.CreateCompatibleDC(mypDC);
+		m_bitmap.CreateCompatibleBitmap(m_mypDC, MAX_SCREEN_X, MAX_SCREEN_Y);		//Make bitmap at same size.
+		m_memdc.CreateCompatibleDC(m_mypDC);
 	}
-	pOldBitmap = memdc.SelectObject(&bitmap);
+	m_pOldBitmap = m_memdc.SelectObject(&m_bitmap);
 
 	CBrush backColor(RGB(MyDisplayGray, MyDisplayGray, MyDisplayGray));
-	CBrush* pOldBrush = memdc.SelectObject(&backColor);
+	CBrush* pOldBrush = m_memdc.SelectObject(&backColor);
 	CRect ViewRect;
-	memdc.GetClipBox(&ViewRect);
-	memdc.PatBlt(ViewRect.left, ViewRect.top, ViewRect.Width(), ViewRect.Height(), PATCOPY);
-	memdc.SelectObject(pOldBrush);
+	m_memdc.GetClipBox(&ViewRect);
+	m_memdc.PatBlt(ViewRect.left, ViewRect.top, ViewRect.Width(), ViewRect.Height(), PATCOPY);
+	m_memdc.SelectObject(pOldBrush);
 
 	dc.BitBlt(0, 0, MAX_SCREEN_X, MAX_SCREEN_Y,
-		&memdc, 0, 0, SRCCOPY);
+		&m_memdc, 0, 0, SRCCOPY);
 }

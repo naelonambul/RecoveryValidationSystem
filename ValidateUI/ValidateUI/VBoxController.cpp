@@ -29,7 +29,7 @@ void Controller::makeTailCommand(int nOrder) {
 	switch (nOrder) {
 	case	VMSTART:	m_MyCommand += " startvm ";
 		m_MyCommand += m_CurrentOS;
-		//m_MyCommand += " --type headless";
+		m_MyCommand += " --type headless";
 		break;
 
 	case	VMSTOP:		m_MyCommand += " controlvm ";

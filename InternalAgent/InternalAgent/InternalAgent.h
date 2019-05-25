@@ -54,13 +54,13 @@ namespace MyData {
 	public:
 		DWORD m_dwPIdKill = 0;
 
-		HANDLE SampleEvent = 0;
-		HANDLE ToolEvent = 0;
+		HANDLE m_SampleEvent = 0;
+		HANDLE m_ToolEvent = 0;
 
 		int m_nCountFile = 0;
 		int m_nVersion = 0;
 		
-		int previousCommand = 0;
+		int m_previousCommand = 0;
 	protected:
 		FILEINFO* m_pCurrentFile;
 		FILEINFO* m_pSampleFile;
@@ -81,16 +81,16 @@ namespace MyData {
 		}
 
 	//attributes func
-		void SetCurrentFileInfo(FILEINFO *pParam)	{
+		void SetCurrentFileInfo(FILEINFO* pParam)	{
 			delete m_pCurrentFile;
 			m_pCurrentFile = pParam;
 		}
 
-		void SetSampleFileInfo(FILEINFO *pParam)	{
+		void SetSampleFileInfo(FILEINFO* pParam)	{
 			m_pSampleFile = pParam;
 		}
 
-		void SetToolFileInfo(FILEINFO *pParam)		{
+		void SetToolFileInfo(FILEINFO* pParam)		{
 			m_pToolFile = pParam;
 		}
 
@@ -106,19 +106,19 @@ namespace MyData {
 			return m_pCurrentFile;
 		}
 
-		DWORD getPIdKill() const					{
+		DWORD GetPIdKill() const					{
 			return m_dwPIdKill;
 		}
 		//map func
-		map<string, string>& Sample_Before()			{
+		map<string, string>& Get_Sample_Before()			{
 			return Sample_Before_Name_Hash;
 		}
 
-		map<string, string>& Sample_After()			{
+		map<string, string>& Get_Sample_After()			{
 			return Sample_After_Name_Hash;
 		}
 
-		map<string, string>& Tool_After()				{
+		map<string, string>& Get_Tool_After()				{
 			return Tool_After_Name_Hash;
 		}
 
@@ -130,7 +130,7 @@ namespace MyData {
 			return 0;
 		}
 
-		void DisPlayMap(map<string, string> mapParam)		{
+		void DisplayMap(map<string, string> mapParam)		{
 			map<string, string> ::iterator PrintIter;
 			if (mapParam.empty() == FALSE)
 			{
@@ -155,13 +155,13 @@ namespace MyData {
 
 		void createEvent()
 		{
-			SampleEvent = ::CreateEvent(
+			m_SampleEvent = ::CreateEvent(
 				NULL,	//디폴트 보안 속성 적용.
 				FALSE,	//자동으로 상태 전환.
 				FALSE,	//초기상태는 FALSE.
 				NULL);	//이름 없음.
 
-			ToolEvent = ::CreateEvent(
+			m_ToolEvent = ::CreateEvent(
 				NULL,	//디폴트 보안 속성 적용.
 				FALSE,	//자동으로 상태 전환.
 				FALSE,	//초기상태는 FALSE.
@@ -194,7 +194,7 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 	Cmd.m_nVersion = agentData->m_nVersion;
 
 	RETURNMESSAGE Error;
-	Error.nCode = agentData->previousCommand;
+	Error.nCode = agentData->m_previousCommand;
 	 _tcscpy_s(Error.szDesc,  str);
 
 	if (hSocket != NULL)
@@ -310,8 +310,8 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 		string MD5(MDHash);
 		return MD5;
 	}
-	/////////////////////////////////////////////////////////////////////////
-	int printList(map<string, string > &nParam)	{
+/////////////////////////////////////////////////////////////////////////
+	int printFileList(map<string, string>& nParam)	{
 		int nCountFile = 0;
 		struct _finddata_t c_file;
 		intptr_t hFile;
@@ -349,9 +349,9 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 		}
 		return nCountFile;
 	}
-	//////////////////////////////////////////////////
+//////////////////////////////////////////////////
 
-	void KillProcess(DWORD dwPIdKill)
+	void killProcess(DWORD dwPIdKill)
 	{
 		HANDLE hProcess = ::OpenProcess(
 			PROCESS_TERMINATE,
@@ -381,20 +381,20 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 			&pi) == TRUE)
 		{
 			::WaitForSingleObject(pi.hProcess, WaitExe);
-			KillProcess(pi.dwProcessId);
+			killProcess(pi.dwProcessId);
 			::CloseHandle(pi.hProcess);
 			::CloseHandle(pi.hThread);
 			_tprintf(_T("Running File is Closed"));
 		}
 	}
 
-	/////////////////////////////////////////////////////
-	void RefreshDirectory(LPTSTR lpDir, HANDLE )
+/////////////////////////////////////////////////////
+	void refreshDirectory(LPTSTR lpDir)
 	{
 		_tprintf(TEXT("Directory (%s) changed.\n"), lpDir);
 	}
 
-	int WatchDirectory()	{
+	int watchDirectory()	{
 
 		TCHAR lpDir[MAX_PATH] = { 0 };
 		SHGetSpecialFolderPathW(NULL, lpDir, CSIDL_MYDOCUMENTS, 0);
@@ -450,9 +450,9 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 
 		return nCount;
 	}
-	////////////////////////////////////////////////////
+////////////////////////////////////////////////////
 
-	int CompareMap(map<string, string> &mAfter, map<string, string> &mBefore) {
+	int compareMap(map<string, string> &mAfter, map<string, string> &mBefore) {
 		int nSame = 0;
 		map<string, string> ::iterator mAfterIter;
 		map<string, string> ::iterator mBeforeIter;
@@ -465,10 +465,10 @@ BOOL SendError(TCHAR* str, cDataStruct *agentData, SOCKET hSocket) {
 
 		return nSame;
 	}
-	/////////////////////////////////////////////////////
+/////////////////////////////////////////////////////
 
 
-	int Version_OS()
+	int versionOS()
 	{
 		int dwMajor, dwMinor;
 		DWORD dwTypeMask;

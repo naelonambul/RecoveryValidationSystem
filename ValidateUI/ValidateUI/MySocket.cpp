@@ -231,13 +231,13 @@ BOOL CMySocket::SendFileToAll(CString& cFilePath)
 
 BOOL CMySocket::closeFlagOn()
 {
-	if (closeFlag == FALSE)
-		closeFlag = TRUE;
-	return closeFlag;
+	if (m_bCloseFlag == FALSE)
+		m_bCloseFlag = TRUE;
+	return m_bCloseFlag;
 }
 
 
 BOOL CMySocket::getFlag() const
 {
-	return closeFlag;
+	return m_bCloseFlag;
 }

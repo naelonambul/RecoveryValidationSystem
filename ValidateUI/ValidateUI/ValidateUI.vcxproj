@@ -204,7 +204,6 @@
     <ClInclude Include="ValidateUI.h" />
     <ClInclude Include="ValidateUIDoc.h" />
     <ClInclude Include="ValidateUIView.h" />
-    <ClInclude Include="VBox.hpp" />
     <ClInclude Include="VBoxController.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -228,7 +227,6 @@
     <ClCompile Include="ValidateUI.cpp" />
     <ClCompile Include="ValidateUIDoc.cpp" />
     <ClCompile Include="ValidateUIView.cpp" />
-    <ClCompile Include="VBox.cpp" />
     <ClCompile Include="VBoxController.cpp" />
   </ItemGroup>
   <ItemGroup>

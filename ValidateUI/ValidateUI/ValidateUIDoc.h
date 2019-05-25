@@ -22,10 +22,10 @@ public:
 	CPtrList m_Version10;
 
 protected:
-	CString pszSamplePath = _T("");
-	CString pszToolPath = _T("");
+	CString m_pszSamplePath = _T("");
+	CString m_pszToolPath = _T("");
 	
-	CString transBuffer = _T(" ");
+	CString m_transBuffer = _T(" ");
 // Operations
 public:
 

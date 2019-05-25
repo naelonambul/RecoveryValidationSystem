@@ -32,13 +32,13 @@ void CControlDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_COMBO_SELECTOS, m_comboOSList);
-}
+} 
 
 
 BEGIN_MESSAGE_MAP(CControlDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_VMRUN, &CControlDlg::OnBnClickedButtonVmRun)
 	ON_BN_CLICKED(IDC_BUTTON_VMRESET, &CControlDlg::OnBnClickedButtonVmReset)
-	ON_BN_CLICKED(IDC_BUTTON_SENDFILE, &CControlDlg::OnBnClickedButtonSendfile)
+	ON_BN_CLICKED(IDC_BUTTON_STARTAGENT, &CControlDlg::OnBnClickedButtonStartAgent)
 	ON_MESSAGE(WM_USER_READY, &CControlDlg::OnUserReady)
 END_MESSAGE_MAP()
 
@@ -100,7 +100,7 @@ void CControlDlg::OnBnClickedButtonVmRun()
 		GetDlgItem(IDC_BUTTON_VMRUN)->EnableWindow(FALSE);
 		GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 
-		VBoxManager.SetCurrentOS(myCurSel);
+		m_VBoxManager.SetCurrentOS(myCurSel);
 
 		pVboxThread->PostThreadMessage(WM_USER_VMSTOP, NULL, NULL);
 		WaitForSingleObject(waitMsg, INFINITE);
@@ -124,7 +124,7 @@ void CControlDlg::OnBnClickedButtonVmRun()
 }
 
 
-void CControlDlg::OnBnClickedButtonSendfile()
+void CControlDlg::OnBnClickedButtonStartAgent()
 {
 	// TODO: Add your control notification handler code here
 
@@ -149,7 +149,7 @@ void CControlDlg::OnBnClickedButtonSendfile()
 			GetDlgItem(IDC_BUTTON_SENDFILE)->EnableWindow(FALSE);
 		}
 	}
-	else if (!VBoxManager.m_nRunning) {
+	else if (!m_VBoxManager.m_nRunning) {
 		StartString.LoadStringW(IDS_STRING_VM_RUNNING);
 		AfxMessageBox(StartString);
 	}
@@ -192,8 +192,8 @@ void CControlDlg::ResetOSList()
 	m_comboOSList.ResetContent();
 
 	map<string, string> ::iterator PrintIter;
-	if (VBoxManager.m_mapOS.empty() == FALSE) {
-		for (PrintIter = VBoxManager.m_mapOS.begin(); PrintIter != VBoxManager.m_mapOS.end(); PrintIter++) {
+	if (m_VBoxManager.m_mapOS.empty() == FALSE) {
+		for (PrintIter = m_VBoxManager.m_mapOS.begin(); PrintIter != m_VBoxManager.m_mapOS.end(); PrintIter++) {
 			wstring printBuffer = wstring(PrintIter->first.begin(), PrintIter->first.end());
 			const wchar_t* result = printBuffer.c_str();
 			m_comboOSList.AddString(result);
@@ -204,12 +204,12 @@ void CControlDlg::ResetOSList()
 void CControlDlg::readyCount(BOOL bState)
 {
 	if (bState) ++nReady;
-	else --nReady;
+	else		--nReady;
 }
 
 BOOL CControlDlg::IsReady()
 {
-	return nReady == VBoxManager.m_nRunMachine;
+	return nReady == m_VBoxManager.m_nRunMachine;
 }
 
 
@@ -239,25 +239,25 @@ UINT CControlDlg::ThreadBox(LPVOID pParam)
 		switch (msg.message)
 		{
 		case WM_USER_VMREADY: 
-			pDlg->VBoxManager.GetProgramFilesPath();
-			pDlg->VBoxManager.Run(VMLIST);
+			pDlg->m_VBoxManager.GetProgramFilesPath();
+			pDlg->m_VBoxManager.Run(VMLIST);
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMSTOP: 
-			pDlg->VBoxManager.Run(VMSTOP);
+			pDlg->m_VBoxManager.Run(VMSTOP);
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMSTART: 
-			pDlg->VBoxManager.Run(VMSTART);
+			pDlg->m_VBoxManager.Run(VMSTART);
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMEXIT: 
-			if(pDlg->VBoxManager.m_nRunMachine != 0)
-				pDlg->VBoxManager.exitAllVm();
+			if(pDlg->m_VBoxManager.m_nRunMachine != 0)
+				pDlg->m_VBoxManager.exitAllVm();
 			SetEvent(pDlg->waitMsg);
 			break;
 		case WM_USER_VMEXITONE:
-			pDlg->VBoxManager.exitOneVm((int)msg.lParam);
+			pDlg->m_VBoxManager.exitOneVm((int)msg.lParam);
 			break;
 		case WM_USER_STOP:  
 			SetEvent(pDlg->waitMsg);

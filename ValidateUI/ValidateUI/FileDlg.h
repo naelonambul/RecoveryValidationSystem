@@ -12,7 +12,7 @@ public:
 	CView*		m_pParentView;
 protected:
 private:
-	CBitmap		new_image;
+	CBitmap		m_newimage;
 	
 	CFont		m_dlgFont;
 	LOGFONT		m_dlgLf;
@@ -21,11 +21,11 @@ private:
 
 	CString		m_bottomString;
 
-	CDC			memdc;
-	CDC*		mypDc = nullptr;
+	CDC			m_memdc;
+	CDC*		m_mypDC = nullptr;
 
-	CBitmap*	pOldBitmap = nullptr;
-	CBitmap		bitmap;
+	CBitmap*	m_pOldBitmap = nullptr;
+	CBitmap		m_bitmap;
 
 
 	// Dialog Data

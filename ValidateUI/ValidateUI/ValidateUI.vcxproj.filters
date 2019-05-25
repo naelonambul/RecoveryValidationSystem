@@ -75,9 +75,6 @@
     <ClInclude Include="VBoxController.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="VBox.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="ValidateUI.cpp">
@@ -123,9 +120,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MySocket.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="VBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PictureEx.cpp">

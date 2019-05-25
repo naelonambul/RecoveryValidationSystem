@@ -286,20 +286,20 @@ UINT CValidateUIApp::ThreadCommand(LPVOID pParam)
 			case COMMAND_RUN_SAMPLE:
 				pMachineDlg->PostMessage(WM_USER_SPINSTART, NULL, SAMPLE);
 				break;
-			case COMMAND_END_SAMPLE:
-				pMachineDlg->PostMessage(WM_USER_SPINSTOP, NULL, SAMPLE);
+			case COMMAND_END_SAMPLE: //for future
 				break;
 			case COMMAND_LOG_SAMPLE:
+				pMachineDlg->PostMessage(WM_USER_SPINSTOP, NULL, SAMPLE);
 				pMachineDlg->m_nInfect = sBuffer.nSize;
 				theApp.m_sCommand.SendCommandToOne(COMMAND_RUN_TOOL, 0, hClient);
 				break;
 			case COMMAND_RUN_TOOL:
 				pMachineDlg->PostMessage(WM_USER_SPINSTART, NULL, TOOL);
 				break;
-			case COMMAND_END_TOOL:
-				pMachineDlg->PostMessage(WM_USER_SPINSTOP, NULL, TOOL);
+			case COMMAND_END_TOOL: //for future
 				break;
 			case COMMAND_LOG_TOOL:
+				pMachineDlg->PostMessage(WM_USER_SPINSTOP, NULL, TOOL);
 				pMachineDlg->m_nRecovery = sBuffer.nSize;
 				//Agent stop
 				theApp.m_sCommand.SendCommandToOne(COMMAND_STOP, 0, hClient);

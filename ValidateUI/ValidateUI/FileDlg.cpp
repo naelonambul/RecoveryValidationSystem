@@ -59,12 +59,12 @@ void CFileDlg::PictureChange(int IDB_NUM)
 {
 	CStatic *m_pPicture1 = (CStatic*)GetDlgItem(IDC_PICVIEW);
 
-	new_image.LoadBitmapW(IDB_NUM);
-	HBITMAP h_old_bitmap = m_pPicture1->SetBitmap(new_image);
+	m_newimage.LoadBitmapW(IDB_NUM);
+	HBITMAP h_old_bitmap = m_pPicture1->SetBitmap(m_newimage);
 	if (h_old_bitmap != NULL)
 		::DeleteObject(h_old_bitmap);
 
-	new_image.Detach();
+	m_newimage.Detach();
 }
 
 
@@ -144,27 +144,27 @@ void CFileDlg::OnPaint()
 	CPaintDC dc(this); // device context for painting
 					   // TODO: Add your message handler code here
 					   // Do not call CDialogEx::OnPaint() for painting messages
-	CDC *mypDC = &dc;
-	if (pOldBitmap == nullptr)
+	CDC *m_mypDC = &dc;
+	if (m_pOldBitmap == nullptr)
 	{
-		bitmap.CreateCompatibleBitmap(mypDC, MAX_SCREEN_X, MAX_SCREEN_Y);		//Make bitmap at same size.
-		memdc.CreateCompatibleDC(mypDC);
+		m_bitmap.CreateCompatibleBitmap(m_mypDC, MAX_SCREEN_X, MAX_SCREEN_Y);		//Make bitmap at same size.
+		m_memdc.CreateCompatibleDC(m_mypDC);
 	}
-	pOldBitmap = memdc.SelectObject(&bitmap);
+	m_pOldBitmap = m_memdc.SelectObject(&m_bitmap);
 
 	CBrush backColor(RGB(MyDisplayGray, MyDisplayGray, MyDisplayGray));
-	CBrush* pOldBrush = memdc.SelectObject(&backColor);
+	CBrush* pOldBrush = m_memdc.SelectObject(&backColor);
 	CRect ViewRect;
-	memdc.GetClipBox(&ViewRect);
-	memdc.PatBlt(ViewRect.left, ViewRect.top, 
+	m_memdc.GetClipBox(&ViewRect);
+	m_memdc.PatBlt(ViewRect.left, ViewRect.top, 
 		ViewRect.Width(), ViewRect.Height(), PATCOPY);
-	memdc.SelectObject(pOldBrush);
-	memdc.SetBkMode(TRANSPARENT);
+	m_memdc.SelectObject(pOldBrush);
+	m_memdc.SetBkMode(TRANSPARENT);
 
 	if (m_bottomString == "") 
 	{
 		SetPen();
-		m_pOldFont = memdc.SelectObject(&m_dlgFont);
+		m_pOldFont = m_memdc.SelectObject(&m_dlgFont);
 
 		CString GuideString;
 
@@ -175,10 +175,10 @@ void CFileDlg::OnPaint()
 
 		m_bottomString = GuideString;
 	}
-	memdc.TextOut(15, 23, m_bottomString);
-	memdc.SelectObject(m_pOldFont);
+	m_memdc.TextOut(15, 23, m_bottomString);
+	m_memdc.SelectObject(m_pOldFont);
 	dc.BitBlt(0, 0, MAX_SCREEN_X, MAX_SCREEN_Y,
-		&memdc, 0, 0, SRCCOPY);
+		&m_memdc, 0, 0, SRCCOPY);
 }
 
 

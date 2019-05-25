@@ -20,7 +20,7 @@ public:
 
 	int nMachineNumber = 0;
 
-	Controller VBoxManager;
+	Controller m_VBoxManager;
 
 	HANDLE waitMsg = NULL;
 
@@ -49,7 +49,7 @@ public:
 	virtual BOOL OnInitDialog();
 	afx_msg void OnBnClickedButtonVmRun();
 	afx_msg void OnBnClickedButtonVmReset();
-	afx_msg void OnBnClickedButtonSendfile();
+	afx_msg void OnBnClickedButtonStartAgent();
 	void readyCount(BOOL bState);
 	BOOL IsReady();
 

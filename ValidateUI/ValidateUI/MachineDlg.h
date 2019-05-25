@@ -10,19 +10,17 @@ class CMachineDlg : public CDialogEx
 	DECLARE_DYNAMIC(CMachineDlg)
 
 private:
-	CBitmap new_image;
+	CBitmap m_newimage;
+	CString m_topString;
 
-	CPen m_FileDlgpen;
-	CString m_bottomString;
+	CDC  m_memdc;								//Double buffer
+	CDC* m_mypDC = nullptr;						//Only OnPaint
 
-	CDC memdc;									//Double buffer
-	CDC *mypDC = nullptr;						//Only OnPaint
+	CBitmap* m_pOldBitmap = nullptr;
+	CBitmap  m_bitmap;
 
-	CBitmap *pOldBitmap = nullptr;
-	CBitmap bitmap;
-
-	int m_nCount;
-	CListBox m_Log_List;
+	int m_nListBoxCount;
+	CListBox m_LogList;
 
 public:
 	CMachineDlg(CWnd* pParent = NULL);   // standard constructor
@@ -32,9 +30,9 @@ public:
 	int m_nInfect = 0;
 	int m_nRecovery = 0;
 
-	CPictureEx m_PictureTop;
-	CPictureEx m_PictureMid;
-	CPictureEx m_PictureBtm;
+	CPictureEx m_PictureTop;				//for vm loading
+	CPictureEx m_PictureMid;				//for sample loading
+	CPictureEx m_PictureBtm;				//for tool loading
 // Dialog Data
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_MACDIS_FORM };
@@ -50,9 +48,8 @@ public:
 
 	void PictureChange(int IDB_NUM);
 	void ListGetCount();
-	void CMachineDlg::ListInsertString(MYLOG* const tmpLog);
+	void ListInsertString(MYLOG* const tmpLog);
 	virtual BOOL OnInitDialog();
-
 
 protected:
 	afx_msg LRESULT OnUserSpinstart(WPARAM wParam, LPARAM lParam);

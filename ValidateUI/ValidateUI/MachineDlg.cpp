@@ -26,7 +26,7 @@ CMachineDlg::~CMachineDlg()
 void CMachineDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_LIST_LOG, m_Log_List);
+	DDX_Control(pDX, IDC_LIST_LOG, m_LogList);
 	DDX_Control(pDX, IDC_MYPICTURETOP, m_PictureTop);
 	DDX_Control(pDX, IDC_MYPICTUREMID, m_PictureMid);
 	DDX_Control(pDX, IDC_MYPICTUREBTM, m_PictureBtm);
@@ -60,12 +60,12 @@ void CMachineDlg::PictureChange(int IDB_NUM)
 {
 	CStatic *m_pPictureOS = (CStatic*)GetDlgItem(IDC_PICMACDIS);
 
-	new_image.LoadBitmapW(IDB_NUM);
-	HBITMAP h_old_bitmap = m_pPictureOS->SetBitmap(new_image);
+	m_newimage.LoadBitmapW(IDB_NUM);
+	HBITMAP h_old_bitmap = m_pPictureOS->SetBitmap(m_newimage);
 	if (h_old_bitmap != NULL)
 		::DeleteObject(h_old_bitmap);
 
-	new_image.Detach();
+	m_newimage.Detach();
 }
 
 
@@ -83,42 +83,42 @@ void CMachineDlg::OnPaint()
 					   // TODO: Add your message handler code here
 					   // Do not call CDialogEx::OnPaint() for painting messages
 
-	CDC *mypDC = &dc;
-	if (pOldBitmap == nullptr)
+	CDC *m_mypDC = &dc;
+	if (m_pOldBitmap == nullptr)
 	{
-		bitmap.CreateCompatibleBitmap(mypDC, MAX_SCREEN_X, MAX_SCREEN_Y);		//Make bitmap at same size.
-		memdc.CreateCompatibleDC(mypDC);
+		m_bitmap.CreateCompatibleBitmap(m_mypDC, MAX_SCREEN_X, MAX_SCREEN_Y);		//Make bitmap at same size.
+		m_memdc.CreateCompatibleDC(m_mypDC);
 	}
-	pOldBitmap = memdc.SelectObject(&bitmap);
+	m_pOldBitmap = m_memdc.SelectObject(&m_bitmap);
 
-	memdc.FillSolidRect(0, 0,
+	m_memdc.FillSolidRect(0, 0,
 		MAX_SCREEN_X, MAX_SCREEN_Y,
 		RGB(255, 255, 255));
 
-	memdc.SetBkColor(RGB(255, 255, 255));
+	m_memdc.SetBkColor(RGB(255, 255, 255));
 
 	CString strFile;
 	strFile.LoadStringW(IDS_STRING_NUMFILE);
 	strFile.AppendFormat(_T("%d"), m_nFile);
-	memdc.TextOut(50, 100, strFile);
+	m_memdc.TextOut(50, 100, strFile);
 
 	CString strInfect;
 	strInfect.LoadStringW(IDS_STRING_INFECTFILE);
 	strInfect.AppendFormat(_T("%d"),m_nInfect);
-	memdc.TextOut(50, 200, strInfect);
+	m_memdc.TextOut(50, 200, strInfect);
 
 	CString strRecovery;
 	strRecovery.LoadStringW(IDS_STRING_RECOVEFILE);
 	strRecovery.AppendFormat(_T("%d"), m_nRecovery);
-	memdc.TextOut(50, 300, strRecovery);
+	m_memdc.TextOut(50, 300, strRecovery);
 
 	dc.BitBlt(0, 0, MAX_SCREEN_X, MAX_SCREEN_Y,
-		&memdc, 0, 0, SRCCOPY);
+		&m_memdc, 0, 0, SRCCOPY);
 
 }
 void CMachineDlg::ListGetCount()
 {
-	m_nCount = m_Log_List.GetCount();
+	m_nListBoxCount = m_LogList.GetCount();
 }
 
 
@@ -149,8 +149,8 @@ void CMachineDlg::ListInsertString(MYLOG* const tmpLog)
 	CommandString.Insert(0, strDataTime);
 
 	ListGetCount();
-	m_Log_List.InsertString(m_nCount, CommandString);
-	m_Log_List.SetCurSel(m_nCount);
+	m_LogList.InsertString(m_nListBoxCount, CommandString);
+	m_LogList.SetCurSel(m_nListBoxCount);
 }
 
 
@@ -229,7 +229,7 @@ afx_msg LRESULT CMachineDlg::OnUserLogprint(WPARAM wParam, LPARAM lParam)
 	CommandString.Insert(0, strDataTime);
 
 	ListGetCount();
-	m_Log_List.InsertString(m_nCount, CommandString);
-	m_Log_List.SetCurSel(m_nCount);
+	m_LogList.InsertString(m_nListBoxCount, CommandString);
+	m_LogList.SetCurSel(m_nListBoxCount);
 	return 0;
 }
