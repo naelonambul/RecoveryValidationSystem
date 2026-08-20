@@ -12,31 +12,32 @@
 
 ## System Overview
 
-```mermaid
-flowchart TB
-    subgraph HOST["Host PC"]
-        controller["ValidateUI<br/><b>MFC Host Controller</b><br/><br/>VirtualBox lifecycle automation<br/>TCP server / file distribution<br/>Agent status & result aggregation<br/>CSV report generation"]
-    end
-
-    subgraph VBOX["VirtualBox · Host-only Network"]
-        direction LR
-
-        subgraph WIN7["Windows 7 VM"]
-            agent7["InternalAgent<br/><b>Guest Worker</b>"]
-        end
-
-        subgraph WIN81["Windows 8.1 VM"]
-            agent81["InternalAgent<br/><b>Guest Worker</b>"]
-        end
-
-        subgraph WIN10["Windows 10 VM"]
-            agent10["InternalAgent<br/><b>Guest Worker</b>"]
-        end
-    end
-
-    controller -->|"Host-only TCP/IP"| agent7
-    controller -->|"Host-only TCP/IP"| agent81
-    controller -->|"Host-only TCP/IP"| agent10
+```text
+             Host PC
+             ┌─────────────────────────────────────┐
+             │ ValidateUI                          │
+             │ MFC Host Controller                 │
+             │                                     │
+             │ VirtualBox lifecycle automation     │
+             │ TCP server / file distribution      │
+             │ Agent status & result aggregation   │
+             │ CSV report generation               │
+             └──────────────────┬──────────────────┘
+                                │
+                        Host-only TCP/IP
+                                │
+          ┌─────────────────────┼─────────────────────┐
+          │                     │                     │
+          ▼                     ▼                     ▼
+┌───────────────────┐ ┌───────────────────┐ ┌───────────────────┐
+│ VirtualBox VM     │ │ VirtualBox VM     │ │ VirtualBox VM     │
+│ ┌───────────────┐ │ │ ┌───────────────┐ │ │ ┌───────────────┐ │
+│ │ Windows 7     │ │ │ │ Windows 8.1   │ │ │ │ Windows 10    │ │
+│ │               │ │ │ │               │ │ │ │               │ │
+│ │ InternalAgent │ │ │ │ InternalAgent │ │ │ │ InternalAgent │ │
+│ │ Guest Worker  │ │ │ │ Guest Worker  │ │ │ │ Guest Worker  │ │
+│ └───────────────┘ │ │ └───────────────┘ │ │ └───────────────┘ │
+└───────────────────┘ └───────────────────┘ └───────────────────┘
 ```
 
 `ValidateUI`가 호스트에서 VirtualBox VM과 TCP 연결을 관리하고, 각 VM의 `InternalAgent`가 파일 상태 측정과 검증 작업을 수행합니다.
