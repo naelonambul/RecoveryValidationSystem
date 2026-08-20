@@ -13,7 +13,7 @@ ValidateUI.vcxproj
     This is the main project file for VC++ projects generated using an application wizard.
     It contains information about the version of Visual C++ that generated the file, and
     information about the platforms, configurations, and project features selected with the
-    Application Wizard.
+    application wizard.
 
 ValidateUI.vcxproj.filters
     This is the filters file for VC++ projects generated using an Application Wizard. 
@@ -102,7 +102,8 @@ makehtmlhelp.bat
     This file is used by the build system to compile the help files.
 
 hlp\Images\*.gif
-    These are bitmap files required by the standard help file topics.
+    These are bitmap files required by the standard help file topics for
+    Microsoft Foundation Class Library standard commands.
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -146,8 +147,10 @@ The application wizard uses "TODO:" to indicate parts of the source code you
 should add to or customize.
 
 If your application uses MFC in a shared DLL, you will need
-to redistribute the MFC DLLs. If your application is in a language other than
-the operating system's locale, you will also need to redistribute the corresponding localized resources MFC100XXX.DLL.
-For more information on both these topics, please see the section on redistributing Visual C++ applications in MSDN documentation.
+to redistribute the MFC DLLs. If your application is in a language
+other than the operating system's locale, you will also have to
+redistribute the corresponding localized resources MFC100XXX.DLL.
+For more information on both of these topics, please see the section on
+redistributing Visual C++ applications in MSDN documentation.
 
 /////////////////////////////////////////////////////////////////////////////
