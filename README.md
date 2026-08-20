@@ -26,10 +26,13 @@ Host PC
                 │ Host-only TCP/IP
        ┌────────┼────────┐
        ▼        ▼        ▼
-    Win 7    Win 8.1   Win 10
-       │        │        │
-       └── InternalAgent ┘
-           Guest Worker
+┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
+│ VirtualBox VM   │ │ VirtualBox VM   │ │ VirtualBox VM   │
+│ Windows 7       │ │ Windows 8.1     │ │ Windows 10      │
+│                 │ │                 │ │                 │
+│ InternalAgent   │ │ InternalAgent   │ │ InternalAgent   │
+│ Guest Worker    │ │ Guest Worker    │ │ Guest Worker    │
+└─────────────────┘ └─────────────────┘ └─────────────────┘
 ```
 
 `ValidateUI`가 호스트에서 VirtualBox VM과 TCP 연결을 관리하고, 각 VM의 `InternalAgent`가 파일 상태 측정과 검증 작업을 수행합니다.
